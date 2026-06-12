@@ -1,4 +1,4 @@
-import { Ropa, Electronica, Muebles, Adornos, Utensilios } from '../../../database/mongodb/schema.js';
+import { Ropa, Electronica, Muebles, Adornos, Utensilios } from '../config/schema.js';
 
 const modeloPorCategoria = {
   ropa: Ropa,

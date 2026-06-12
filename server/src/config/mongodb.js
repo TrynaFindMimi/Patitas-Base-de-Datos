@@ -1,9 +1,8 @@
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-dotenv.config();
 
 const connectMongo = async () => {
-  await mongoose.connect(process.env.MONGO_URI, {
+  const uri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/patitas_catalog';
+  await mongoose.connect(uri, {
     serverSelectionTimeoutMS: 5000,
   });
   console.log('MongoDB conectado');

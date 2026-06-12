@@ -1,5 +1,5 @@
 import { query, getClient } from '../config/postgres.js';
-import { Carrito } from '../../../database/mongodb/schema.js';
+import { Carrito } from '../config/schema.js';
 
 export const crearPedido = async (req, res) => {
   const client = await getClient();

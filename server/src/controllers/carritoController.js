@@ -1,4 +1,4 @@
-import { Carrito, Preferencias } from '../../../database/mongodb/schema.js';
+import { Carrito, Preferencias } from '../config/schema.js';
 
 export const obtenerCarrito = async (req, res) => {
   const carrito = await Carrito.findOne({ cliente_uuid: req.usuario.cliente_id });

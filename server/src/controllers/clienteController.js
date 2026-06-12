@@ -1,5 +1,5 @@
 import { query, getClient } from '../config/postgres.js';
-import { Carrito, Preferencias } from '../../../database/mongodb/schema.js';
+import { Carrito, Preferencias } from '../config/schema.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';

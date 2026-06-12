@@ -10,6 +10,7 @@ import catalogoRouter from './src/routes/catalogo.js';
 import carritoRouter from './src/routes/carrito.js';
 
 dotenv.config();
+process.env.MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/patitas_catalog';
 
 const app = express();
 
