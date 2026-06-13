@@ -10,7 +10,14 @@ router.use(verificarToken);
 router.get('/', obtenerPedidos);
 router.get('/:id', obtenerPedido);
 router.post('/',
-  [body('direccion_id').isInt(), body('items').isArray({ min: 1 })],
+  [
+    body('direccion_id').optional().isInt(),
+    body('calle').optional().notEmpty(),
+    body('ciudad').optional().notEmpty(),
+    body('estado').optional().notEmpty(),
+    body('codigo_postal').optional().notEmpty(),
+    body('items').isArray({ min: 1 }),
+  ],
   validar, crearPedido
 );
 router.post('/pago',
