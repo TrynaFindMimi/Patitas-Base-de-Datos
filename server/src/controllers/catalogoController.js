@@ -1,11 +1,9 @@
-import { Ropa, Electronica, Muebles, Adornos, Utensilios } from '../config/schema.js';
+import { Comida, Ropa, Juguetes } from '../config/schema.js';
 
 const modeloPorCategoria = {
+  comida: Comida,
   ropa: Ropa,
-  electronica: Electronica,
-  muebles: Muebles,
-  adornos: Adornos,
-  utensilios_cocina: Utensilios,
+  juguetes: Juguetes,
 };
 
 export const listarProductos = async (req, res) => {

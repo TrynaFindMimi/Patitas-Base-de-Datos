@@ -5,11 +5,9 @@ import ProductCard from '../components/ProductCard';
 import { IconSearch } from '../components/Icons';
 
 const CATEGORIAS = [
-  { id: 'ropa', nombre: 'Ropa' },
-  { id: 'electronica', nombre: 'Electronica' },
-  { id: 'muebles', nombre: 'Muebles' },
-  { id: 'adornos', nombre: 'Adornos' },
-  { id: 'utensilios_cocina', nombre: 'Utensilios de Cocina' },
+  { id: 'comida',   nombre: 'Comida' },
+  { id: 'ropa',     nombre: 'Ropa' },
+  { id: 'juguetes', nombre: 'Juguetes' },
 ];
 
 export default function Catalog() {
@@ -82,7 +80,7 @@ export default function Catalog() {
         </div>
         <div>
           <h1 className="text-3xl font-black text-text" style={{ fontFamily: 'var(--font-family-display)' }}>Catalogo</h1>
-          <p className="text-text-muted text-sm">Ropa, Electronica, Muebles, Adornos y Utensilios</p>
+          <p className="text-text-muted text-sm">Comida, Ropa y Juguetes para tu mascota</p>
         </div>
       </div>
 
@@ -133,7 +131,7 @@ export default function Catalog() {
 
             <h4 className="text-sm font-bold text-text mb-2 uppercase tracking-wider">Etiqueta</h4>
             <div className="space-y-1">
-              {['casual', 'premium', 'wireless', 'outdoor', 'minimalista'].map(tag => (
+              {['premium', 'natural', 'invierno', 'interactivo', 'dental', 'moda'].map(tag => (
                 <button key={tag} onClick={() => setFilter('etiqueta', activeEtiqueta === tag ? '' : tag)}
                   className={`block w-full text-left px-3 py-2 rounded-xl text-sm font-bold transition-all brutal-border brutal-shadow-sm hover-lift cursor-pointer ${activeEtiqueta === tag ? 'bg-primary text-white' : 'bg-white text-text-muted'}`}>
                   {tag}
