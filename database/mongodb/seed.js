@@ -21,6 +21,10 @@ const comida = [
   { producto_id: 'COM-002', nombre: 'Alimento Humedo Atun Gato', precio: 45, marca: 'Whiskas', tipo_animal: ['gato'], peso_kg: 0.4, sabores: ['atun','salmon'], etiquetas: ['humedo','natural'], industria: ['mascotas','nutricion'], stock: 150 },
   { producto_id: 'COM-003', nombre: 'Snacks Dentales Perro', precio: 95, marca: 'Pedigree', tipo_animal: ['perro'], peso_kg: 0.5, sabores: ['menta','pollo'], etiquetas: ['dental','premio','snack'], industria: ['mascotas','salud'], stock: 120 },
   { producto_id: 'COM-004', nombre: 'Alimento Senior Perro 7+', precio: 210, marca: 'Royal Canin', tipo_animal: ['perro'], peso_kg: 2, sabores: ['pollo','arroz integral'], etiquetas: ['senior','premium','digestivo'], industria: ['mascotas','nutricion'], stock: 45 },
+  { producto_id: 'COM-005', nombre: 'Alimento Natural Sin Granos Perro', precio: 250, marca: 'Acana', tipo_animal: ['perro'], peso_kg: 2.5, sabores: ['salmon','batata'], etiquetas: ['natural','sin granos','premium'], industria: ['mascotas','nutricion'], stock: 35 },
+  { producto_id: 'COM-006', nombre: 'Comida Humeda Gato Salmon', precio: 55, marca: 'Purina Gourmet', tipo_animal: ['gato'], peso_kg: 0.4, sabores: ['salmon','camaron'], etiquetas: ['humedo','premium','gato'], industria: ['mascotas','nutricion'], stock: 120 },
+  { producto_id: 'COM-007', nombre: 'Alimento Cachorro Raza Pequena', precio: 195, marca: 'Royal Canin', tipo_animal: ['perro'], peso_kg: 1.5, sabores: ['pollo'], etiquetas: ['cachorro','premium','raza pequena'], industria: ['mascotas','nutricion'], stock: 60 },
+  { producto_id: 'COM-008', nombre: 'Snack Natural Pollo Deshidratado', precio: 65, marca: 'Purina Pro Plan', tipo_animal: ['perro','gato'], peso_kg: 0.2, sabores: ['pollo'], etiquetas: ['natural','premio','snack'], industria: ['mascotas','salud'], stock: 200 },
 ];
 
 const ropa = [
@@ -28,6 +32,8 @@ const ropa = [
   { producto_id: 'ROP-002', nombre: 'Camiseta Verano Gato', precio: 85, marca: 'CatFashion', tipo_animal: ['gato'], tallas: ['XS','S','M'], colores: ['blanco','rosa','celeste'], material: 'algodon', etiquetas: ['verano','casual','gato'], industria: ['mascotas','moda'], stock: 30 },
   { producto_id: 'ROP-003', nombre: 'Impermeable Lluvia Perro', precio: 310, marca: 'RainPet', tipo_animal: ['perro'], tallas: ['S','M','L','XL'], colores: ['amarillo','naranja'], material: 'nylon', etiquetas: ['lluvia','impermeable','funcional'], industria: ['mascotas','moda'], stock: 25 },
   { producto_id: 'ROP-004', nombre: 'Pijama Navidad Mascotas', precio: 175, marca: 'PetStyle', tipo_animal: ['perro','gato'], tallas: ['XS','S','M','L'], colores: ['rojo','verde'], material: 'algodon', etiquetas: ['navidad','invierno','moda'], industria: ['mascotas','moda'], stock: 60 },
+  { producto_id: 'ROP-005', nombre: 'Arnes Reflectante Perro', precio: 195, marca: 'PetStyle', tipo_animal: ['perro'], tallas: ['S','M','L','XL'], colores: ['neon','azul','rojo'], material: 'neopreno', etiquetas: ['arnes','reflectante','seguridad'], industria: ['mascotas','moda'], stock: 40 },
+  { producto_id: 'ROP-006', nombre: 'Sueter Tejido Mascotas Pequenas', precio: 135, marca: 'CatFashion', tipo_animal: ['perro','gato'], tallas: ['XS','S','M'], colores: ['gris','beige','verde'], material: 'lanilla', etiquetas: ['invierno','tejido','calido'], industria: ['mascotas','moda'], stock: 55 },
 ];
 
 const juguetes = [
