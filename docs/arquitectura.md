@@ -76,29 +76,30 @@ API REST — Express (puerto 3001)
 
 | Colección | Atributos específicos por categoría |
 |---|---|
-| `productos_ropa` | tallas [ ], colores [ ], material, genero |
-| `productos_electronica` | voltaje, potencia_watts, garantia_meses, conectividad [ ] |
-| `productos_muebles` | material, dimensiones { alto, ancho, profundidad, peso }, estilo |
-| `productos_adornos` | material, colores [ ], ocasion [ ], estilo |
-| `productos_utensilios` | apto_lavavajillas, capacidad_litros, variantes [ ] |
+| `productos_comida` | peso_kg, sabores [ ], tipo_animal [ ] |
+| `productos_ropa` | tallas [ ], colores [ ], material, tipo_animal [ ] |
+| `productos_juguetes` | material, edad_minima_meses, interactivo, variantes [ ] |
+| `productos_accesorios` | material, colores [ ], variantes [ ], tipo_animal [ ] |
+| `productos_salud` | tipo_producto, requiere_receta, presentacion [ ] |
 | `carritos` | Carrito activo vinculado al cliente por UUID |
 | `preferencias` | Historial y preferencias del cliente vinculado por UUID |
 
 ### Campos tipo arreglo usados en queries
 
 - `tallas`, `colores`, `etiquetas`, `industria` (presentes en todas las categorías)
-- `conectividad`, `compatible_con` (electrónica)
-- `variantes` (ropa y utensilios)
-- `ocasion` (adornos)
+- `tipo_animal` (filtro por especie: perro, gato, etc.)
+- `sabores` (comida)
+- `variantes` (juguetes, accesorios)
+- `presentacion` (salud)
 
 ### Queries con operadores de comparación y lógicos
 
 | Query | Operadores utilizados |
 |---|---|
-| Electrónica con precio > 500 y stock > 20 | `$and`, `$gt` |
+| Productos por especie y precio > 500 | `$and`, `$in`, `$gt` |
 | Ropa talla M o L con precio < 500 | `$and`, `$in`, `$lt` |
-| Muebles de madera o precio < 1000 | `$or`, `$regex`, `$lt` |
-| Productos aptos lavavajillas entre $800 y $1500 | `$and`, `$gte`, `$lte` |
+| Juguetes interactivos para gatos | `$and`, `$eq` |
+| Productos por etiqueta (arreglo) | `$in` |
 | Productos por industria (arreglo exacto) | `$all` |
 | Búsqueda por nombre en todas las colecciones | `$regex`, `$options` |
 

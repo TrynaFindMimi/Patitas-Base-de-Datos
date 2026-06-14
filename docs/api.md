@@ -78,13 +78,13 @@ El token JWT se obtiene al hacer login o registro. Expira en 7 días.
 
 ### Categorías válidas
 
-| Valor | Colección MongoDB |
-|---|---|
-| `ropa` | `productos_ropa` |
-| `electronica` | `productos_electronica` |
-| `muebles` | `productos_muebles` |
-| `adornos` | `productos_adornos` |
-| `utensilios_cocina` | `productos_utensilios` |
+| Valor | Colección MongoDB | Descripción |
+|---|---|---|
+| `comida` | `productos_comida` | Alimentos secos, húmedos y snacks |
+| `ropa` | `productos_ropa` | Abrigos, camisetas, arneses y accesorios de vestir |
+| `juguetes` | `productos_juguetes` | Juguetes interactivos, cuerdas, rascadores |
+| `accesorios` | `productos_accesorios` | Collares, camas, transportadores, correas |
+| `salud` | `productos_salud` | Antiparasitarios, suplementos, shampoos |
 
 ---
 
