@@ -37,12 +37,40 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: 'Error interno del servidor' });
 });
 
+const requiredEnv = ['PG_HOST', 'PG_USER', 'PG_PASSWORD', 'PG_DATABASE', 'JWT_SECRET'];
+const missing = requiredEnv.filter(k => !process.env[k]);
+if (missing.length) {
+  console.error(`Faltan variables de entorno: ${missing.join(', ')}`);
+  process.exit(1);
+}
+
+let server;
+
 const start = async () => {
   await connectMongo();
   await pool.query('SELECT 1');
   console.log('PostgreSQL conectado');
   const PORT = process.env.PORT ?? 3001;
-  app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
+  server = app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
 };
 
-start().catch(console.error);
+start().catch((err) => {
+  console.error('Error al iniciar servidor:', err.message);
+  process.exit(1);
+});
+
+const gracefulShutdown = async (signal) => {
+  console.log(`\n${signal} recibido. Cerrando servidor...`);
+  if (server) {
+    server.close(() => {
+      console.log('Servidor HTTP cerrado');
+    });
+  }
+  await mongoose.connection.close().catch(() => {});
+  await pool.end().catch(() => {});
+  console.log('Conexiones cerradas');
+  process.exit(0);
+};
+
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));

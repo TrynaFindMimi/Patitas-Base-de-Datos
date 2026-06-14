@@ -5,24 +5,25 @@ const CartContext = createContext(null);
 const cartReducer = (state, action) => {
   switch (action.type) {
     case 'ADD_ITEM': {
-      const existing = state.items.find(i => i.id === action.product.id);
+      const prodId = String(action.product.id);
+      const existing = state.items.find(i => i.id === prodId);
       if (existing) {
         return {
           ...state,
           items: state.items.map(i =>
-            i.id === action.product.id ? { ...i, quantity: i.quantity + 1 } : i
+            i.id === prodId ? { ...i, quantity: i.quantity + 1 } : i
           ),
         };
       }
-      return { ...state, items: [...state.items, { ...action.product, quantity: 1 }] };
+      return { ...state, items: [...state.items, { ...action.product, id: prodId, quantity: 1 }] };
     }
     case 'REMOVE_ITEM':
-      return { ...state, items: state.items.filter(i => i.id !== action.id) };
+      return { ...state, items: state.items.filter(i => i.id !== String(action.id)) };
     case 'UPDATE_QUANTITY':
       return {
         ...state,
         items: state.items.map(i =>
-          i.id === action.id ? { ...i, quantity: Math.max(1, action.quantity) } : i
+          i.id === String(action.id) ? { ...i, quantity: Math.max(1, action.quantity) } : i
         ),
       };
     case 'CLEAR_CART':
@@ -46,9 +47,9 @@ export function CartProvider({ children }) {
     localStorage.setItem('patitas-cart', JSON.stringify(state.items));
   }, [state.items]);
 
-  const addItem = (product) => dispatch({ type: 'ADD_ITEM', product });
-  const removeItem = (id) => dispatch({ type: 'REMOVE_ITEM', id });
-  const updateQuantity = (id, quantity) => dispatch({ type: 'UPDATE_QUANTITY', id, quantity });
+  const addItem = (product) => dispatch({ type: 'ADD_ITEM', product: { ...product, id: String(product.id) } });
+  const removeItem = (id) => dispatch({ type: 'REMOVE_ITEM', id: String(id) });
+  const updateQuantity = (id, quantity) => dispatch({ type: 'UPDATE_QUANTITY', id: String(id), quantity });
   const clearCart = () => dispatch({ type: 'CLEAR_CART' });
 
   const totalItems = state.items.reduce((sum, i) => sum + i.quantity, 0);
