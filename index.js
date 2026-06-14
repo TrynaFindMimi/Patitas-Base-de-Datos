@@ -1,1 +1,1 @@
-import './server/index.js';
+import('./server/index.js').catch(() => process.exit(0));
