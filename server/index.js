@@ -24,12 +24,16 @@ app.use('/api/catalogo', catalogoRouter);
 app.use('/api/carrito', carritoRouter);
 
 app.get('/api/health', async (_req, res) => {
-  const pg = await pool.query('SELECT 1');
-  res.json({
-    status: 'ok',
-    postgres: !!pg,
-    mongo: mongoose.connection.readyState === 1
-  });
+  try {
+    const pg = await pool.query('SELECT 1');
+    res.json({
+      status: 'ok',
+      postgres: !!pg,
+      mongo: mongoose.connection.readyState === 1
+    });
+  } catch {
+    res.status(503).json({ status: 'error', postgres: false, mongo: false });
+  }
 });
 
 app.use((err, _req, res, _next) => {
@@ -47,7 +51,9 @@ if (missing.length) {
 let server;
 
 const start = async () => {
-  await connectMongo();
+  await connectMongo().catch(() =>
+    console.warn('MongoDB no disponible — catálogo y carrito desactivados')
+  );
   await pool.query('SELECT 1');
   console.log('PostgreSQL conectado');
   const PORT = process.env.PORT ?? 3001;
