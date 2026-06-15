@@ -1,0 +1,20 @@
+{
+  "name": "patitas",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "install:all": "cd server && npm install && cd ../client && npm install",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev": "npm run dev:server & npm run dev:client",
+    "postinstall": "cd server && npm install",
+    "build": "",
+    "start": "cd server && npm start",
+    "docker:up": "docker compose up -d --build",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "setup:db": "cd database/mongodb && node seed.js",
+    "lint": "cd client && npm run lint"
+  }
+}

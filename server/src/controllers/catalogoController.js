@@ -23,8 +23,9 @@ export const listarProductos = async (req, res) => {
 
     const skip = (Number(page) - 1) * Number(limit);
 
-    if (categoria && modeloPorCategoria[categoria]) {
+    if (categoria) {
       const Modelo = modeloPorCategoria[categoria];
+      if (!Modelo) return res.status(400).json({ error: 'Categoria invalida' });
       const [productos, total] = await Promise.all([
         Modelo.find(filtro).skip(skip).limit(Number(limit)),
         Modelo.countDocuments(filtro),

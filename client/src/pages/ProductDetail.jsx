@@ -1,13 +1,42 @@
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { products } from '../data/products';
+import { catalogoService } from '../services/catalogo.js';
+import { productImages } from '../data/products';
 import { useCart } from '../context/CartContext';
 import { IconTruck, IconShield } from '../components/Icons';
 
 export default function ProductDetail() {
   const { id } = useParams();
   const { addItem, items } = useCart();
+  const [apiProduct, setApiProduct] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const product = products.find(p => p.id === Number(id));
+  const product = products.find(p => p.id === Number(id) || String(p.id) === id) || apiProduct;
+
+  useEffect(() => {
+    if (products.find(p => p.id === Number(id) || String(p.id) === id)) return;
+    setLoading(true);
+    catalogoService.listar({}).then(data => {
+      const items = data.productos ?? data ?? [];
+      const found = items.find(p => (p.producto_id || p._id) === id);
+      if (found) {
+        setApiProduct({
+          id: found.producto_id || found._id,
+          name: found.nombre,
+          price: found.precio,
+          image: productImages[found.producto_id] || `https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&h=600&fit=crop`,
+          category: found.categoria,
+          brand: found.marca || '',
+          type: found.tipo || '',
+          description: found.descripcion || found.nombre,
+          rating: found.rating || 4,
+          isNew: false,
+          promo: null,
+        });
+      }
+    }).catch(() => {}).finally(() => setLoading(false));
+  }, [id]);
   if (!product) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-20 text-center">
@@ -36,7 +65,7 @@ export default function ProductDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <div className="relative">
           <div className="aspect-square rounded-2xl overflow-hidden brutal-border brutal-shadow-lg bg-white">
-            <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+            <img src={product.image} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
           </div>
           {product.isNew && (
             <div className="absolute top-4 left-4 sticker bg-neon-purple text-white animate-bounce-in">NUEVO</div>

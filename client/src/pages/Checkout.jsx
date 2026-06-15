@@ -1,14 +1,17 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { IconCheck } from '../components/Icons';
+import { IconCheck, IconFileText } from '../components/Icons';
 import { pedidoService } from '../services/catalogo.js';
+import { generateInvoicePDF } from '../utils/invoice.js';
 
 export default function Checkout() {
   const { items, subtotal, clearCart } = useCart();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState('');
+  const [orderData, setOrderData] = useState(null);
   const [form, setForm] = useState({
     name: '', email: '', phone: '', address: '', city: '', state: '', zip: '', card: '', expiry: '', cvv: '',
   });
@@ -41,14 +44,44 @@ export default function Checkout() {
         codigo_postal: form.zip,
       });
 
-      await pedidoService.pagar({ pedido_id: pedido.pedido_id, metodo_id: 1 });
+      const pago = await pedidoService.pagar({ pedido_id: pedido.pedido_id, metodo_id: 1 });
 
+      const cliente = JSON.parse(localStorage.getItem('patitas_user') || '{}');
+
+      setOrderData({
+        pedido_id: pedido.pedido_id,
+        factura_id: pago.factura_id,
+        items: itemsFormateados,
+        subtotal,
+        envio: subtotal >= 999 ? 0 : 99,
+        total: subtotal + (subtotal >= 999 ? 0 : 99),
+        direccion: {
+          calle: form.address,
+          ciudad: form.city,
+          estado: form.state,
+        },
+        cliente,
+        fecha: new Date().toISOString(),
+      });
       clearCart();
       setSubmitted(true);
     } catch (err) {
       setError(err.message || 'Error al procesar el pedido');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDownloadInvoice = () => {
+    if (!orderData) return;
+    setDownloading(true);
+    try {
+      const doc = generateInvoicePDF(orderData);
+      doc.save(`factura-${orderData.pedido_id.slice(0, 8).toLowerCase()}.pdf`);
+    } catch (err) {
+      console.error('Error al generar PDF:', err);
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -59,8 +92,23 @@ export default function Checkout() {
           <IconCheck className="w-12 h-12 text-white" />
         </div>
         <h2 className="text-3xl font-black text-text mb-2" style={{ fontFamily: 'var(--font-family-display)' }}>Pedido confirmado!</h2>
-        <p className="text-text-muted mb-6 text-lg">Tu pedido fue registrado y pagado exitosamente en la base de datos.</p>
-        <Link to="/" className="inline-block bg-primary text-white font-bold px-8 py-4 rounded-xl brutal-border brutal-shadow hover-lift transition-all">Volver al inicio</Link>
+        <p className="text-text-muted mb-2 text-lg">Tu pedido fue registrado y pagado exitosamente.</p>
+        {orderData?.factura_id && (
+          <p className="text-sm text-text-muted mb-6">Factura N°: <span className="font-bold text-primary">{orderData.factura_id}</span></p>
+        )}
+        <div className="flex flex-wrap gap-4 justify-center">
+          <button
+            onClick={handleDownloadInvoice}
+            disabled={downloading}
+            className="inline-flex items-center gap-2 bg-primary text-white font-bold px-8 py-4 rounded-xl brutal-border brutal-shadow hover-lift transition-all cursor-pointer disabled:opacity-50"
+          >
+            <IconFileText className="w-5 h-5" />
+            {downloading ? 'Generando...' : 'Descargar factura PDF'}
+          </button>
+          <Link to="/" className="inline-flex items-center gap-2 bg-accent text-text font-bold px-8 py-4 rounded-xl brutal-border brutal-shadow hover-lift transition-all">
+            Volver al inicio
+          </Link>
+        </div>
       </div>
     );
   }

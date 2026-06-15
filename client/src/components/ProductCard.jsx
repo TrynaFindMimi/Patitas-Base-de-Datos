@@ -20,7 +20,7 @@ export default function ProductCard({ product }) {
       <Link to={`/producto/${product.id}`}>
         <div className="aspect-square overflow-hidden relative">
           <img
-            src={product.image}
+            src={product.image} loading="lazy"
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             loading="lazy"

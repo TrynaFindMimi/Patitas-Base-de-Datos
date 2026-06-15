@@ -38,9 +38,13 @@ export default function Login() {
           <button type="submit" disabled={cargando} className="w-full bg-primary text-white font-bold py-3 rounded-xl brutal-border brutal-shadow hover-lift transition-all disabled:opacity-50">
             {cargando ? 'Ingresando...' : 'Ingresar'}
           </button>
+          <div className="flex items-center justify-between text-sm mt-2">
+            <Link to="/registro" className="text-primary font-bold hover:underline">Registrate</Link>
+            <span className="text-text-muted">¿Olvidaste tu contraseña?</span>
+          </div>
         </form>
         <p className="text-center text-sm text-text-muted mt-4">
-          No tienes cuenta? <Link to="/registro" className="text-primary font-bold">Registrate</Link>
+          ¿Problemas para ingresar? Contacta a <a href="mailto:soporte@patitas.bo" className="text-primary font-bold">soporte@patitas.bo</a>
         </p>
       </div>
     </div>

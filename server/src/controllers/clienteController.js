@@ -65,7 +65,7 @@ export const agregarDireccion = async (req, res) => {
   res.status(201).json(rows[0]);
 };
 
-export const agregarMetodoPago = async (req, res) => {
+export const agregarMetodoPago = async (req, res, next) => {
   const client = await getClient();
   try {
     await client.query('BEGIN');
@@ -81,7 +81,7 @@ export const agregarMetodoPago = async (req, res) => {
     res.status(201).json(rows[0]);
   } catch (err) {
     await client.query('ROLLBACK');
-    throw err;
+    next(err);
   } finally {
     client.release();
   }

@@ -1,32 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { categories, heroImages } from '../data/products';
+import { categories, heroImages, productImages } from '../data/products';
+import { catalogoService } from '../services/catalogo';
 import ProductCard from '../components/ProductCard';
 import CategoryCard from '../components/CategoryCard';
 import { IconTruck, IconShield, IconHeart, IconPhone } from '../components/Icons';
-
-const imagenesDestacados = {
-  'COM-001': 'https://ss345.liverpool.com.mx/xl/1056366039.jpg',
-  'COM-002': 'https://cdn.eddress.co/market-products/merchants/7wg0D5ChQU-pXxzCDmVhkA/69a5fb126850433c84d3e88d--5vTg5doR3S2DpsB9SuQxQ-Ev8ikHshQ9mvlqNMZ7pE9g.png?v=1772485443439',
-  'COM-003': 'https://patitasco.com/6588-large_default/milo-y-lola-snacks-dentales-para-perro.jpg',
-  'COM-004': 'https://www.purina.com.bo/sites/default/files/styles/webp/public/2022-09/LONGEVIDAD%20ADULTOS%207%2B-dog-chow-frente.jpeg.webp?itok=GOjFfF68',
-  'ROP-001': 'https://m.media-amazon.com/images/I/7176ZRdpSYL._AC_SX679_.jpg',
-  'ROP-002': 'https://m.media-amazon.com/images/I/71q5QmqdYML._AC_SX679_.jpg',
-  'ROP-003': 'https://acdn-us.mitiendanube.com/stores/575/267/products/chatgpt-image-23-may-2025-14_02_47-bfd0033504eeaded5617480201346783-1024-1024.webp',
-  'ROP-004': 'https://m.media-amazon.com/images/I/81W7vxMC2iL.jpg',
-  'JUG-001': 'https://de2kqc9pq55cj.cloudfront.net/fit-in/700x700/filters:fill(FFFFFF):quality(90):format(webp)/_img_productos/pelota-interactiva-loi-g-073-gris-16551-foto1.jpg',
-  'JUG-002': 'https://m.media-amazon.com/images/I/81We9qHdqPL._AC_SX679_.jpg',
-  'JUG-003': 'https://cdn0.expertoanimal.com/es/posts/5/5/2/como_funciona_el_kong_para_perros_20255_600.jpg',
-  'JUG-004': 'https://www.tiendanimal.es/dw/image/v2/BDLQ_PRD/on/demandware.static/-/Sites-kiwoko-master-catalog/default/dwdba6169e/images/large/43e3e4f5d4de4811ba942634bbecde4f.jpg?sw=780&sh=780&sm=fit&q=85',
-  'ACC-001': 'https://ae01.alicdn.com/kf/Sa919a941119b41fda1b6b9eb00c85d84H.jpg',
-  'ACC-002': 'https://cdn.billowshop.com/0bd0313a-ccf0-5fc3/img/Producto/d7a86b57-46ca-ba90-d788-9980aef5e5f1/8445-2-66c71e3adc675-O.jpg',
-  'ACC-003': 'https://petformed.com/es/wp-content/uploads/sites/7/2024/04/Legowisko-Petformed-Niebieskie-2.jpg',
-  'ACC-004': 'https://pethome.cl/imagenes/productos/mochila-transporte-astronauta-color-rojo.webp',
-  'SAL-001': 'https://postgradoveterinaria.com/wp-content/uploads/pipetas-para-perros.jpg',
-  'SAL-002': 'https://www.tiendanimal.es/dw/image/v2/BDLQ_PRD/on/demandware.static/-/Sites-kiwoko-master-catalog/default/dwfc4bcb3c/images/large/0fe8bdfcac6e4ffb8b6810cfbf9da441.jpg?sw=780&sh=780&sm=fit&q=85',
-  'SAL-003': 'https://m.media-amazon.com/images/I/81C89UmtLoL._AC_UF1000,1000_QL80_.jpg',
-  'SAL-004': 'https://m.media-amazon.com/images/I/61iUWfX+HyL.jpg',
-};
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -38,24 +16,21 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/catalogo')
-      .then(r => r.json())
-      .then(data => {
-        const items = (data.productos ?? []).slice(0, 4).map(p => ({
-          id: p.producto_id,
-          name: p.nombre,
-          price: p.precio,
-          brand: p.marca,
-          category: p.categoria,
-          rating: 4.5,
-          image: imagenesDestacados[p.producto_id] || 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=300&fit=crop',
-          description: p.descripcion || p.nombre,
-          isNew: false,
-          discount: 0,
-        }));
-        setFeatured(items);
-      })
-      .catch(() => {});
+    catalogoService.listar().then(data => {
+      const items = (data.productos ?? []).slice(0, 4).map(p => ({
+        id: p.producto_id,
+        name: p.nombre,
+        price: p.precio,
+        brand: p.marca,
+        category: p.categoria,
+        rating: 4.5,
+        image: p.image || productImages[p.producto_id] || 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=300&fit=crop',
+        description: p.descripcion || p.nombre,
+        isNew: false,
+        discount: 0,
+      }));
+      setFeatured(items);
+    }).catch(() => {});
   }, []);
 
   return (

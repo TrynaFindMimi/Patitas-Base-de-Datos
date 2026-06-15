@@ -45,7 +45,7 @@ CREATE OR REPLACE FUNCTION fn_procesar_pago(
 DECLARE
     v_factura_id    UUID;
     v_total         NUMERIC(10,2);
-    v_num_factura   VARCHAR(20);
+    v_num_factura   VARCHAR(50);
 BEGIN
     SELECT total INTO v_total FROM pedidos WHERE pedido_id = p_pedido_id;
 

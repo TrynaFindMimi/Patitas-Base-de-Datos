@@ -1,7 +1,7 @@
 import { query, getClient } from '../config/postgres.js';
 import { Carrito } from '../config/schema.js';
 
-export const crearPedido = async (req, res) => {
+export const crearPedido = async (req, res, next) => {
   const client = await getClient();
   try {
     await client.query('BEGIN');
@@ -33,13 +33,13 @@ export const crearPedido = async (req, res) => {
     res.status(201).json({ pedido_id });
   } catch (err) {
     await client.query('ROLLBACK');
-    throw err;
+    next(err);
   } finally {
     client.release();
   }
 };
 
-export const procesarPago = async (req, res) => {
+export const procesarPago = async (req, res, next) => {
   const client = await getClient();
   try {
     await client.query('BEGIN');
@@ -54,30 +54,38 @@ export const procesarPago = async (req, res) => {
     res.json({ factura_id: rows[0].factura_id, estado: 'pagado' });
   } catch (err) {
     await client.query('ROLLBACK');
-    throw err;
+    next(err);
   } finally {
     client.release();
   }
 };
 
-export const obtenerPedidos = async (req, res) => {
-  const { rows } = await query(
-    `SELECT pedido_id, estado, total, creado_en FROM pedidos
-     WHERE cliente_id = $1 ORDER BY creado_en DESC`,
-    [req.usuario.cliente_id]
-  );
-  res.json(rows);
+export const obtenerPedidos = async (req, res, next) => {
+  try {
+    const { rows } = await query(
+      `SELECT pedido_id, estado, total, creado_en FROM pedidos
+       WHERE cliente_id = $1 ORDER BY creado_en DESC`,
+      [req.usuario.cliente_id]
+    );
+    res.json(rows);
+  } catch (err) {
+    next(err);
+  }
 };
 
-export const obtenerPedido = async (req, res) => {
-  const { rows } = await query(
-    `SELECT p.*, json_agg(dp.*) AS items
-     FROM pedidos p
-     JOIN detalle_pedido dp ON dp.pedido_id = p.pedido_id
-     WHERE p.pedido_id = $1 AND p.cliente_id = $2
-     GROUP BY p.pedido_id`,
-    [req.params.id, req.usuario.cliente_id]
-  );
-  if (!rows.length) return res.status(404).json({ error: 'Pedido no encontrado' });
-  res.json(rows[0]);
+export const obtenerPedido = async (req, res, next) => {
+  try {
+    const { rows } = await query(
+      `SELECT p.*, json_agg(dp.*) AS items
+       FROM pedidos p
+       JOIN detalle_pedido dp ON dp.pedido_id = p.pedido_id
+       WHERE p.pedido_id = $1 AND p.cliente_id = $2
+       GROUP BY p.pedido_id`,
+      [req.params.id, req.usuario.cliente_id]
+    );
+    if (!rows.length) return res.status(404).json({ error: 'Pedido no encontrado' });
+    res.json(rows[0]);
+  } catch (err) {
+    next(err);
+  }
 };

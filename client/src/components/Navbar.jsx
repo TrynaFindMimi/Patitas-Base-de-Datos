@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { IconHome, IconGrid, IconBell, IconTag, IconPhone, IconShoppingBag, IconPaw } from './Icons';
+import { useAuth } from '../context/AuthContext';
+import { IconHome, IconGrid, IconBell, IconTag, IconPhone, IconShoppingBag, IconPaw, IconUser } from './Icons';
 
 const navItems = [
   { path: '/', label: 'Home', icon: IconHome },
@@ -12,7 +14,9 @@ const navItems = [
 
 export default function Navbar() {
   const { totalItems } = useCart();
+  const { usuario, logout } = useAuth();
   const location = useLocation();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <>
@@ -71,12 +75,31 @@ export default function Navbar() {
                 )}
               </Link>
 
+              {usuario ? (
+                <div className="relative group">
+                  <button className="bg-primary text-white brutal-border brutal-shadow-sm rounded-xl p-2.5 hover-lift transition-all cursor-pointer">
+                    <IconUser className="w-6 h-6" />
+                  </button>
+                  <div className="absolute right-0 top-full mt-2 w-52 bg-white brutal-border brutal-shadow-lg rounded-2xl p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                    <p className="text-sm font-bold text-text truncate mb-2">{usuario.nombre}</p>
+                    <Link to="/mis-pedidos" className="block w-full text-left px-3 py-2 rounded-xl text-sm font-bold bg-white text-text hover:bg-accent transition-all mb-1">
+                      Mis pedidos
+                    </Link>
+                    <button onClick={logout} className="w-full text-left px-3 py-2 rounded-xl text-sm font-bold bg-red-50 text-red-600 hover:bg-red-100 transition-all cursor-pointer">
+                      Cerrar sesion
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <Link to="/login" className="bg-primary text-white brutal-border brutal-shadow-sm rounded-xl px-4 py-2.5 text-sm font-bold hover-lift transition-all flex items-center gap-1.5">
+                  <IconUser className="w-5 h-5" />
+                  <span className="hidden sm:inline">Ingresar</span>
+                </Link>
+              )}
+
               <button
                 className="lg:hidden bg-white brutal-border brutal-shadow-sm rounded-xl p-2.5 hover-lift transition-all cursor-pointer"
-                onClick={() => {
-                  const menu = document.getElementById('mobile-menu');
-                  menu.classList.toggle('hidden');
-                }}
+                onClick={() => setMobileOpen(o => !o)}
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16"/>
@@ -85,23 +108,33 @@ export default function Navbar() {
             </div>
           </div>
 
-          <div id="mobile-menu" className="hidden lg:hidden pb-4 space-y-2">
-            {navItems.map(item => (
+          {mobileOpen && (
+            <div className="lg:hidden pb-4 space-y-2">
+              {navItems.map(item => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setMobileOpen(false)}
+                  className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all brutal-border brutal-shadow-sm ${
+                    location.pathname === item.path
+                      ? 'bg-primary text-white'
+                      : 'bg-white text-text hover:bg-accent'
+                  }`}
+                >
+                  <item.icon className="w-4 h-4" />
+                  <span>{item.label}</span>
+                </Link>
+              ))}
               <Link
-                key={item.path}
-                to={item.path}
-                onClick={() => document.getElementById('mobile-menu').classList.add('hidden')}
-                className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all brutal-border brutal-shadow-sm ${
-                  location.pathname === item.path
-                    ? 'bg-primary text-white'
-                    : 'bg-white text-text hover:bg-accent'
-                }`}
+                to={usuario ? '/' : '/login'}
+                onClick={() => { if (usuario) logout(); setMobileOpen(false); }}
+                className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all brutal-border brutal-shadow-sm bg-white text-text hover:bg-accent"
               >
-                <item.icon className="w-4 h-4" />
-                <span>{item.label}</span>
+                <IconUser className="w-4 h-4" />
+                <span>{usuario ? 'Cerrar sesion' : 'Ingresar'}</span>
               </Link>
-            ))}
-          </div>
+            </div>
+          )}
         </div>
       </nav>
     </>
