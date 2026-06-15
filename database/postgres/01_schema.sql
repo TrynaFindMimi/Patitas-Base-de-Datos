@@ -77,6 +77,8 @@ CREATE TABLE IF NOT EXISTS pedidos (
     actualizado_en  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS departamento VARCHAR(50) NOT NULL DEFAULT 'La Paz';
+
 CREATE TABLE IF NOT EXISTS detalle_pedido (
     detalle_id      SERIAL PRIMARY KEY,
     pedido_id       UUID NOT NULL REFERENCES pedidos(pedido_id) ON DELETE CASCADE,
