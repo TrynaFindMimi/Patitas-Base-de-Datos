@@ -32,7 +32,7 @@ export default function Cart() {
           {items.map((item, index) => (
             <div key={item.id} className="bg-white brutal-border brutal-shadow rounded-2xl p-4 flex gap-4 hover-lift transition-all" style={{ animationDelay: `${index * 100}ms` }}>
               <Link to={`/producto/${item.id}`} className="w-24 h-24 rounded-xl overflow-hidden brutal-border shrink-0">
-                <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                <img src={item.image} alt={item.name} className="w-full h-full object-cover" loading="lazy" />
               </Link>
               <div className="flex-1 min-w-0">
                 <Link to={`/producto/${item.id}`}>

@@ -65,7 +65,7 @@ export default function ProductDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <div className="relative">
           <div className="aspect-square rounded-2xl overflow-hidden brutal-border brutal-shadow-lg bg-white">
-            <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+            <img src={product.image} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
           </div>
           {product.isNew && (
             <div className="absolute top-4 left-4 sticker bg-neon-purple text-white animate-bounce-in">NUEVO</div>
