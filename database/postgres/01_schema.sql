@@ -26,10 +26,10 @@ CREATE TABLE IF NOT EXISTS direcciones (
 CREATE TABLE IF NOT EXISTS metodos_pago (
     metodo_id           SERIAL PRIMARY KEY,
     cliente_id          UUID NOT NULL REFERENCES clientes(cliente_id) ON DELETE CASCADE,
-    tipo                VARCHAR(20) NOT NULL CHECK (tipo IN ('credito','debito')),
-    ultimos_4_digitos   VARCHAR(4) NOT NULL,
-    numero_encriptado   BYTEA NOT NULL,
-    fecha_expiracion    VARCHAR(7) NOT NULL,
+    tipo                VARCHAR(20) NOT NULL CHECK (tipo IN ('credito','debito','qr')),
+    ultimos_4_digitos   VARCHAR(4) NOT NULL DEFAULT '',
+    numero_encriptado   BYTEA,
+    fecha_expiracion    VARCHAR(7) NOT NULL DEFAULT '',
     es_principal        BOOLEAN NOT NULL DEFAULT FALSE,
     creado_en           TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -40,10 +40,34 @@ CREATE TABLE IF NOT EXISTS categorias (
     descripcion     TEXT
 );
 
+CREATE TABLE IF NOT EXISTS departamentos (
+    departamento_id     SERIAL PRIMARY KEY,
+    nombre              VARCHAR(50) NOT NULL UNIQUE,
+    costo_envio         NUMERIC(10,2) NOT NULL DEFAULT 0,
+    tipo_envio_oferta   VARCHAR(20) NOT NULL DEFAULT 'paqueteria'
+                        CHECK (tipo_envio_oferta IN ('domicilio','paqueteria')),
+    envio_gratis_desde  NUMERIC(10,2) NOT NULL DEFAULT 99999
+);
+
+INSERT INTO departamentos (nombre, costo_envio, tipo_envio_oferta, envio_gratis_desde) VALUES
+  ('La Paz',      15,  'domicilio',  500),
+  ('Oruro',       20,  'domicilio',  500),
+  ('Santa Cruz',  25,  'domicilio',  500),
+  ('Cochabamba',  30,  'paqueteria', 500),
+  ('Chuquisaca',  35,  'paqueteria', 500),
+  ('Tarija',      35,  'paqueteria', 500),
+  ('Potosí',      40,  'paqueteria', 500),
+  ('Beni',        45,  'paqueteria', 500),
+  ('Pando',       50,  'paqueteria', 500)
+ON CONFLICT (nombre) DO NOTHING;
+
 CREATE TABLE IF NOT EXISTS pedidos (
     pedido_id       UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     cliente_id      UUID NOT NULL REFERENCES clientes(cliente_id),
     direccion_id    INT NOT NULL REFERENCES direcciones(direccion_id),
+    departamento    VARCHAR(50) NOT NULL DEFAULT 'La Paz',
+    tipo_envio      VARCHAR(20) NOT NULL DEFAULT 'domicilio'
+                    CHECK (tipo_envio IN ('domicilio','paqueteria')),
     estado          VARCHAR(20) NOT NULL DEFAULT 'pendiente'
                     CHECK (estado IN ('pendiente','procesando','enviado','entregado','cancelado')),
     subtotal        NUMERIC(10,2) NOT NULL DEFAULT 0,
@@ -67,7 +91,7 @@ CREATE TABLE IF NOT EXISTS facturas (
     factura_id      UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     pedido_id       UUID NOT NULL UNIQUE REFERENCES pedidos(pedido_id),
     cliente_id      UUID NOT NULL REFERENCES clientes(cliente_id),
-    numero_factura  VARCHAR(20) NOT NULL UNIQUE,
+    numero_factura  VARCHAR(30) NOT NULL UNIQUE,
     total           NUMERIC(10,2) NOT NULL,
     emitida_en      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     estado          VARCHAR(20) NOT NULL DEFAULT 'emitida'
@@ -77,10 +101,10 @@ CREATE TABLE IF NOT EXISTS facturas (
 CREATE TABLE IF NOT EXISTS pagos (
     pago_id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     factura_id      UUID NOT NULL REFERENCES facturas(factura_id),
-    metodo_id       INT NOT NULL REFERENCES metodos_pago(metodo_id),
+    metodo_id       INT REFERENCES metodos_pago(metodo_id),
     monto           NUMERIC(10,2) NOT NULL CHECK (monto > 0),
     estado          VARCHAR(20) NOT NULL DEFAULT 'completado'
-                    CHECK (estado IN ('completado','fallido','reembolsado')),
+                    CHECK (estado IN ('pendiente','completado','fallido','reembolsado')),
     procesado_en    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

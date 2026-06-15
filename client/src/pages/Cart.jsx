@@ -65,16 +65,14 @@ export default function Cart() {
             </div>
             <div className="flex justify-between bg-white brutal-border rounded-xl px-4 py-3">
               <span className="font-bold">Envio</span>
-              <span className="font-black">{subtotal >= 999 ? 'Gratis!' : 'Bs 99.00'}</span>
+              <span className="font-black">Calculado en checkout</span>
             </div>
-            {subtotal < 999 && (
-              <div className="bg-primary/10 brutal-border rounded-xl px-4 py-2 text-center">
-                <p className="text-xs font-bold text-primary">Agrega Bs {(999 - subtotal).toFixed(2)} mas para envio gratis</p>
-              </div>
-            )}
+            <div className="bg-primary/10 brutal-border rounded-xl px-4 py-2 text-center">
+              <p className="text-xs font-bold text-primary">Envio gratis desde Bs 500 a todo el pais</p>
+            </div>
             <div className="bg-text text-white brutal-border rounded-xl px-4 py-4 flex justify-between">
-              <span className="font-black text-lg">Total</span>
-              <span className="font-black text-lg text-accent" style={{ fontFamily: 'var(--font-family-display)' }}>Bs {(subtotal + (subtotal >= 999 ? 0 : 99)).toFixed(2)}</span>
+              <span className="font-black text-lg">Subtotal</span>
+              <span className="font-black text-lg text-accent" style={{ fontFamily: 'var(--font-family-display)' }}>Bs {subtotal.toFixed(2)}</span>
             </div>
           </div>
           <Link to="/checkout" className="block mt-6 bg-primary text-white text-center font-black py-4 rounded-xl brutal-border brutal-shadow hover-lift transition-all text-lg">

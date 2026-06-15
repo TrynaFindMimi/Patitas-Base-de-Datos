@@ -19,6 +19,7 @@ export const carritoService = {
 };
 
 export const pedidoService = {
+  departamentos: () => api.get('/pedidos/departamentos'),
   crear:   (datos) => api.post('/pedidos', datos),
   pagar:   (datos) => api.post('/pedidos/pago', datos),
   listar:  ()      => api.get('/pedidos'),
