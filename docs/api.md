@@ -160,6 +160,60 @@ El token JWT se obtiene al hacer login o registro. Expira en 7 días.
 
 ---
 
+## Administración (owner/admin)
+
+Todas las rutas requieren `Authorization: Bearer <token>` y rol `owner` o `admin`.
+
+| Método | Ruta | Auth | Descripción |
+|---|---|---|---|
+| GET | `/admin/productos` | owner/admin | Listar todos los productos (stock, activo) |
+| POST | `/admin/productos/:categoria` | owner/admin | Crear un nuevo producto |
+| PUT | `/admin/productos/:categoria/:id` | owner/admin | Actualizar producto (stock, activo, precio, etc.) |
+| GET | `/admin/pedidos` | owner/admin | Listar todos los pedidos con detalle |
+| PUT | `/admin/pedidos/:id/estado` | owner/admin | Cambiar estado de un pedido |
+
+### Categorías válidas para productos
+
+`comida`, `ropa`, `juguetes`, `accesorios`, `salud`
+
+### POST /admin/productos/:categoria
+
+```json
+{
+  "producto_id": "COM-016",
+  "nombre": "Croquetas Premium",
+  "precio": 120.00,
+  "marca": "Royal Canin",
+  "descripcion": "Alimento balanceado para perros adultos",
+  "stock": 50,
+  "image": "https://...",
+  "tipo_animal": ["perro"],
+  "activo": true
+}
+```
+
+Solo `producto_id`, `nombre` y `precio` son obligatorios.
+
+### PUT /admin/productos/:categoria/:id
+
+```json
+{ "stock": 100, "activo": false }
+```
+
+Se puede enviar cualquier combinación de campos: `nombre`, `precio`, `marca`, `image`, `descripcion`, `tipo_animal`, `stock`, `activo`, `etiquetas`.
+
+### Estados válidos para pedidos
+
+`pendiente`, `procesando`, `enviado`, `entregado`, `cancelado`
+
+### PUT /admin/pedidos/:id/estado
+
+```json
+{ "estado": "enviado" }
+```
+
+---
+
 ## Health Check
 
 | Método | Ruta | Descripción |

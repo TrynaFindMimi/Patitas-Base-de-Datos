@@ -28,5 +28,8 @@ export const pedidoService = {
 
 export const adminService = {
   listar: () => api.get('/admin/productos'),
-  actualizarStock: (categoria, id, stock) => api.put(`/admin/productos/${categoria}/${id}/stock`, { stock }),
+  crearProducto: (categoria, datos) => api.post(`/admin/productos/${categoria}`, datos),
+  actualizarProducto: (categoria, id, datos) => api.put(`/admin/productos/${categoria}/${id}`, datos),
+  pedidos: () => api.get('/admin/pedidos'),
+  actualizarEstado: (id, estado) => api.put(`/admin/pedidos/${id}/estado`, { estado }),
 };
