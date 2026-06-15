@@ -4,24 +4,33 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 
-export const registrar = async (req, res) => {
-  const { nombre, apellido, email, password } = req.body;
-  const hash = await bcrypt.hash(password, 12);
-  const cliente_id = uuidv4();
+export const registrar = async (req, res, next) => {
+  try {
+    const { nombre, apellido, email, password } = req.body;
+    const hash = await bcrypt.hash(password, 12);
+    const cliente_id = uuidv4();
 
-  const { rows } = await query(
-    `INSERT INTO clientes (cliente_id, nombre, apellido, email, password_hash)
-     VALUES ($1, $2, $3, $4, $5) RETURNING cliente_id, nombre, email`,
-    [cliente_id, nombre, apellido, email, hash]
-  );
+    const { rows } = await query(
+      `INSERT INTO clientes (cliente_id, nombre, apellido, email, password_hash)
+       VALUES ($1, $2, $3, $4, $5) RETURNING cliente_id, nombre, email`,
+      [cliente_id, nombre, apellido, email, hash]
+    );
 
-  await Promise.all([
-    Carrito.create({ cliente_uuid: cliente_id, items: [] }),
-    Preferencias.create({ cliente_uuid: cliente_id }),
-  ]);
+    try {
+      await Promise.all([
+        Carrito.create({ cliente_uuid: cliente_id, items: [] }),
+        Preferencias.create({ cliente_uuid: cliente_id }),
+      ]);
+    } catch (mongoErr) {
+      await query('DELETE FROM clientes WHERE cliente_id = $1', [cliente_id]);
+      return res.status(503).json({ error: `MongoDB no disponible: ${mongoErr.message}` });
+    }
 
-  const token = jwt.sign({ cliente_id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-  res.status(201).json({ cliente: rows[0], token });
+    const token = jwt.sign({ cliente_id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    res.status(201).json({ cliente: rows[0], token });
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const login = async (req, res) => {
