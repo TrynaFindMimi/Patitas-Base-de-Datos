@@ -13,8 +13,9 @@ export const listarDepartamentos = async (_req, res, next) => {
 };
 
 export const crearPedido = async (req, res, next) => {
-  const client = await getClient();
+  let client;
   try {
+    client = await getClient();
     await client.query('BEGIN');
     const { items, departamento, tipo_envio, calle, ciudad, estado, codigo_postal } = req.body;
 
@@ -55,16 +56,19 @@ export const crearPedido = async (req, res, next) => {
     await client.query('COMMIT');
     res.status(201).json({ pedido_id, ...pedido[0] });
   } catch (err) {
-    await client.query('ROLLBACK');
+    if (client) {
+      try { await client.query('ROLLBACK'); } catch {}
+    }
     next(err);
   } finally {
-    client.release();
+    if (client) client.release();
   }
 };
 
 export const procesarPago = async (req, res, next) => {
-  const client = await getClient();
+  let client;
   try {
+    client = await getClient();
     await client.query('BEGIN');
     const { pedido_id, tipo_pago, metodo_id } = req.body;
     const pTipo = tipo_pago || 'qr';
@@ -82,10 +86,12 @@ export const procesarPago = async (req, res, next) => {
     await client.query('COMMIT');
     res.json(factura[0]);
   } catch (err) {
-    await client.query('ROLLBACK');
+    if (client) {
+      try { await client.query('ROLLBACK'); } catch {}
+    }
     next(err);
   } finally {
-    client.release();
+    if (client) client.release();
   }
 };
 
