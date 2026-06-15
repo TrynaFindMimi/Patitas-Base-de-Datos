@@ -1,8 +1,6 @@
 CREATE OR REPLACE FUNCTION fn_registrar_pedido(
     p_cliente_id    UUID,
     p_direccion_id  INT,
-    p_departamento  VARCHAR(50),
-    p_tipo_envio    VARCHAR(20),
     p_items         JSONB
 ) RETURNS UUID AS $$
 DECLARE
@@ -10,20 +8,9 @@ DECLARE
     v_item          JSONB;
     v_subtotal      NUMERIC(10,2) := 0;
     v_envio         NUMERIC(10,2) := 0;
-    v_envio_base    NUMERIC(10,2);
-    v_gratis_desde  NUMERIC(10,2);
 BEGIN
-    SELECT costo_envio, envio_gratis_desde
-    INTO v_envio_base, v_gratis_desde
-    FROM departamentos
-    WHERE nombre = p_departamento;
-
-    IF v_envio_base IS NULL THEN
-        RAISE EXCEPTION 'Departamento % no encontrado', p_departamento;
-    END IF;
-
-    INSERT INTO pedidos (cliente_id, direccion_id, departamento, tipo_envio)
-    VALUES (p_cliente_id, p_direccion_id, p_departamento, p_tipo_envio)
+    INSERT INTO pedidos (cliente_id, direccion_id)
+    VALUES (p_cliente_id, p_direccion_id)
     RETURNING pedido_id INTO v_pedido_id;
 
     FOR v_item IN SELECT * FROM jsonb_array_elements(p_items) LOOP
@@ -38,7 +25,7 @@ BEGIN
         v_subtotal := v_subtotal + ((v_item->>'cantidad')::INT * (v_item->>'precio_unitario')::NUMERIC);
     END LOOP;
 
-    v_envio := CASE WHEN v_subtotal >= v_gratis_desde THEN 0 ELSE v_envio_base END;
+    v_envio := CASE WHEN v_subtotal >= 999 THEN 0 ELSE 99 END;
 
     UPDATE pedidos
     SET subtotal = v_subtotal,
@@ -53,18 +40,14 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION fn_procesar_pago(
     p_pedido_id     UUID,
-    p_tipo_pago     VARCHAR(20),
-    p_metodo_id     INT DEFAULT NULL
+    p_metodo_id     INT
 ) RETURNS UUID AS $$
 DECLARE
     v_factura_id    UUID;
     v_total         NUMERIC(10,2);
-    v_cliente_id    UUID;
-    v_num_factura   VARCHAR(30);
-    v_qr_metodo_id  INT;
+    v_num_factura   VARCHAR(50);
 BEGIN
-    SELECT total, cliente_id INTO v_total, v_cliente_id
-    FROM pedidos WHERE pedido_id = p_pedido_id;
+    SELECT total INTO v_total FROM pedidos WHERE pedido_id = p_pedido_id;
 
     IF v_total IS NULL THEN
         RAISE EXCEPTION 'Pedido % no encontrado', p_pedido_id;
@@ -72,30 +55,18 @@ BEGIN
 
     v_num_factura := 'FAC-' || TO_CHAR(NOW(), 'YYYYMMDD') || '-' || SUBSTRING(p_pedido_id::TEXT, 1, 8);
 
-    INSERT INTO facturas (pedido_id, cliente_id, numero_factura, total, estado)
-    VALUES (p_pedido_id, v_cliente_id, v_num_factura, v_total,
-            CASE WHEN p_tipo_pago = 'qr' THEN 'emitida' ELSE 'pagada' END)
+    INSERT INTO facturas (pedido_id, cliente_id, numero_factura, total)
+    SELECT p_pedido_id, cliente_id, v_num_factura, v_total
+    FROM pedidos WHERE pedido_id = p_pedido_id
     RETURNING factura_id INTO v_factura_id;
 
-    IF p_tipo_pago = 'qr' THEN
-        INSERT INTO pagos (factura_id, metodo_id, monto, estado)
-        SELECT v_factura_id, metodo_id, v_total, 'pendiente'
-        FROM metodos_pago WHERE metodo_id = p_metodo_id AND tipo = 'qr'
-        LIMIT 1;
+    INSERT INTO pagos (factura_id, metodo_id, monto)
+    VALUES (v_factura_id, p_metodo_id, v_total);
 
-        IF NOT FOUND THEN
-            INSERT INTO pagos (factura_id, monto, estado)
-            VALUES (v_factura_id, v_total, 'pendiente');
-        END IF;
-    ELSE
-        INSERT INTO pagos (factura_id, metodo_id, monto, estado)
-        VALUES (v_factura_id, p_metodo_id, v_total, 'completado');
+    UPDATE pedidos SET estado = 'procesando', actualizado_en = NOW()
+    WHERE pedido_id = p_pedido_id;
 
-        UPDATE pedidos SET estado = 'procesando', actualizado_en = NOW()
-        WHERE pedido_id = p_pedido_id;
-
-        UPDATE facturas SET estado = 'pagada' WHERE factura_id = v_factura_id;
-    END IF;
+    UPDATE facturas SET estado = 'pagada' WHERE factura_id = v_factura_id;
 
     RETURN v_factura_id;
 END;

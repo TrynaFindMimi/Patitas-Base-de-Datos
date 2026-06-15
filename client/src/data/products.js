@@ -3,7 +3,7 @@ export const categories = [
   { id: 'gatos', name: 'Gatos', image: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&h=300&fit=crop', description: 'Mimos y cuidados felinos' },
   { id: 'aves', name: 'Aves', image: 'https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=400&h=300&fit=crop', description: 'Plumas y color' },
   { id: 'roedores', name: 'Roedores', image: 'https://www.clinicanimal.vet/wp-content/uploads/2022/02/clinicanimal-roedores-1-scaled.jpg', description: 'Pequenos y adorables' },
-  { id: 'reptiles', name: 'Reptiles', image: 'https://images.unsplash.com/photo-1559481145-2f7c8b0b1e5c?w=400&h=300&fit=crop', description: 'Escamas y aventura' },
+  { id: 'reptiles', name: 'Reptiles', image: 'https://blog.gardencenterejea.com/wp-content/uploads/2018/11/Reptiles-para-adoptar.jpg', description: 'Escamas y aventura' },
   { id: 'peces', name: 'Peces', image: 'https://images.unsplash.com/photo-1520366498724-709889c0c685?w=400&h=300&fit=crop', description: 'Vida acuatica' },
 ];
 

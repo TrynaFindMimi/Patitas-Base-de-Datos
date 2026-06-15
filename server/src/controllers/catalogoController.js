@@ -34,7 +34,7 @@ export const listarProductos = async (req, res) => {
     }
 
     const resultados = await Promise.all(
-      Object.values(modeloPorCategoria).map(M => M.find(filtro).limit(6))
+      Object.values(modeloPorCategoria).map(M => M.find(filtro).limit(20))
     );
     res.json({ productos: resultados.flat() });
   } catch (err) {
