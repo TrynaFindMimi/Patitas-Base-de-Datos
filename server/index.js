@@ -10,6 +10,7 @@ import clientesRouter from './src/routes/clientes.js';
 import pedidosRouter from './src/routes/pedidos.js';
 import catalogoRouter from './src/routes/catalogo.js';
 import carritoRouter from './src/routes/carrito.js';
+import adminRouter from './src/routes/admin.js';
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use('/api/clientes', clientesRouter);
 app.use('/api/pedidos', pedidosRouter);
 app.use('/api/catalogo', catalogoRouter);
 app.use('/api/carrito', carritoRouter);
+app.use('/api/admin', adminRouter);
 
 app.get('/api/health', async (_req, res) => {
   try {

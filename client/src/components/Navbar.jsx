@@ -85,6 +85,11 @@ export default function Navbar() {
                     <Link to="/mis-pedidos" className="block w-full text-left px-3 py-2 rounded-xl text-sm font-bold bg-white text-text hover:bg-accent transition-all mb-1">
                       Mis pedidos
                     </Link>
+                    {(usuario?.rol === 'owner' || usuario?.rol === 'admin') && (
+                      <Link to="/admin/stock" className="block w-full text-left px-3 py-2 rounded-xl text-sm font-bold bg-amber-50 text-amber-700 hover:bg-amber-100 transition-all mb-1">
+                        Gestionar Stock
+                      </Link>
+                    )}
                     <button onClick={logout} className="w-full text-left px-3 py-2 rounded-xl text-sm font-bold bg-red-50 text-red-600 hover:bg-red-100 transition-all cursor-pointer">
                       Cerrar sesion
                     </button>
