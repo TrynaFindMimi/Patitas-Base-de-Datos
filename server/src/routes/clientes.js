@@ -7,11 +7,16 @@ import { validar } from '../middleware/validate.js';
 const router = Router();
 
 router.post('/registro',
-  [body('email').isEmail(), body('password').isLength({ min: 8 }), body('nombre').notEmpty(), body('apellido').notEmpty()],
+  [
+    body('email').isEmail().withMessage('Email invalido'),
+    body('password').isLength({ min: 8 }).withMessage('La contraseña debe tener al menos 8 caracteres'),
+    body('nombre').notEmpty().withMessage('El nombre es requerido'),
+    body('apellido').notEmpty().withMessage('El apellido es requerido'),
+  ],
   validar, registrar
 );
 router.post('/login',
-  [body('email').isEmail(), body('password').notEmpty()],
+  [body('email').isEmail().withMessage('Email invalido'), body('password').notEmpty().withMessage('Contraseña requerida')],
   validar, login
 );
 router.get('/perfil', verificarToken, obtenerPerfil);
