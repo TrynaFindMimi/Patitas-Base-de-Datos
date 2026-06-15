@@ -81,6 +81,13 @@ ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS departamento VARCHAR(50) NOT NULL D
 ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS tipo_envio VARCHAR(20) NOT NULL DEFAULT 'domicilio';
 ALTER TABLE facturas ALTER COLUMN numero_factura TYPE VARCHAR(30);
 ALTER TABLE pagos ALTER COLUMN metodo_id DROP NOT NULL;
+ALTER TABLE pagos DROP CONSTRAINT IF EXISTS pagos_estado_check;
+ALTER TABLE pagos ADD CONSTRAINT pagos_estado_check CHECK (estado IN ('pendiente','completado','fallido','reembolsado'));
+ALTER TABLE metodos_pago DROP CONSTRAINT IF EXISTS metodos_pago_tipo_check;
+ALTER TABLE metodos_pago ADD CONSTRAINT metodos_pago_tipo_check CHECK (tipo IN ('credito','debito','qr'));
+ALTER TABLE metodos_pago ALTER COLUMN numero_encriptado DROP NOT NULL;
+ALTER TABLE metodos_pago ALTER COLUMN ultimos_4_digitos SET DEFAULT '';
+ALTER TABLE metodos_pago ALTER COLUMN fecha_expiracion SET DEFAULT '';
 
 CREATE TABLE IF NOT EXISTS detalle_pedido (
     detalle_id      SERIAL PRIMARY KEY,
