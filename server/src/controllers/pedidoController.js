@@ -43,10 +43,14 @@ export const crearPedido = async (req, res, next) => {
       [pedido_id]
     );
 
-    await Carrito.findOneAndUpdate(
-      { cliente_uuid: req.usuario.cliente_id },
-      { items: [], actualizado_en: new Date() }
-    );
+    try {
+      await Carrito.findOneAndUpdate(
+        { cliente_uuid: req.usuario.cliente_id },
+        { items: [], actualizado_en: new Date() }
+      );
+    } catch {
+      console.warn('No se pudo limpiar el carrito en MongoDB');
+    }
 
     await client.query('COMMIT');
     res.status(201).json({ pedido_id, ...pedido[0] });
