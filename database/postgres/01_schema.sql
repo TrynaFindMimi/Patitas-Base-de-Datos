@@ -1,7 +1,7 @@
-﻿CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TABLE clientes (
+CREATE TABLE IF NOT EXISTS clientes (
     cliente_id      UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     nombre          VARCHAR(100) NOT NULL,
     apellido        VARCHAR(100) NOT NULL,
@@ -13,7 +13,7 @@ CREATE TABLE clientes (
     activo          BOOLEAN NOT NULL DEFAULT TRUE
 );
 
-CREATE TABLE direcciones (
+CREATE TABLE IF NOT EXISTS direcciones (
     direccion_id    SERIAL PRIMARY KEY,
     cliente_id      UUID NOT NULL REFERENCES clientes(cliente_id) ON DELETE CASCADE,
     calle           VARCHAR(200) NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE direcciones (
     es_principal    BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE TABLE metodos_pago (
+CREATE TABLE IF NOT EXISTS metodos_pago (
     metodo_id           SERIAL PRIMARY KEY,
     cliente_id          UUID NOT NULL REFERENCES clientes(cliente_id) ON DELETE CASCADE,
     tipo                VARCHAR(20) NOT NULL CHECK (tipo IN ('credito','debito')),
@@ -34,13 +34,13 @@ CREATE TABLE metodos_pago (
     creado_en           TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE categorias (
+CREATE TABLE IF NOT EXISTS categorias (
     categoria_id    SERIAL PRIMARY KEY,
     nombre          VARCHAR(80) NOT NULL UNIQUE,
     descripcion     TEXT
 );
 
-CREATE TABLE pedidos (
+CREATE TABLE IF NOT EXISTS pedidos (
     pedido_id       UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     cliente_id      UUID NOT NULL REFERENCES clientes(cliente_id),
     direccion_id    INT NOT NULL REFERENCES direcciones(direccion_id),
@@ -53,7 +53,7 @@ CREATE TABLE pedidos (
     actualizado_en  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE detalle_pedido (
+CREATE TABLE IF NOT EXISTS detalle_pedido (
     detalle_id      SERIAL PRIMARY KEY,
     pedido_id       UUID NOT NULL REFERENCES pedidos(pedido_id) ON DELETE CASCADE,
     producto_mongo_id VARCHAR(24) NOT NULL,
@@ -63,7 +63,7 @@ CREATE TABLE detalle_pedido (
     subtotal        NUMERIC(10,2) GENERATED ALWAYS AS (cantidad * precio_unitario) STORED
 );
 
-CREATE TABLE facturas (
+CREATE TABLE IF NOT EXISTS facturas (
     factura_id      UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     pedido_id       UUID NOT NULL UNIQUE REFERENCES pedidos(pedido_id),
     cliente_id      UUID NOT NULL REFERENCES clientes(cliente_id),
@@ -74,7 +74,7 @@ CREATE TABLE facturas (
                     CHECK (estado IN ('emitida','pagada','anulada'))
 );
 
-CREATE TABLE pagos (
+CREATE TABLE IF NOT EXISTS pagos (
     pago_id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     factura_id      UUID NOT NULL REFERENCES facturas(factura_id),
     metodo_id       INT NOT NULL REFERENCES metodos_pago(metodo_id),
@@ -84,8 +84,8 @@ CREATE TABLE pagos (
     procesado_en    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_pedidos_cliente ON pedidos(cliente_id);
-CREATE INDEX idx_pedidos_estado ON pedidos(estado);
-CREATE INDEX idx_detalle_pedido ON detalle_pedido(pedido_id);
-CREATE INDEX idx_pagos_factura ON pagos(factura_id);
-CREATE INDEX idx_facturas_pedido ON facturas(pedido_id);
+CREATE INDEX IF NOT EXISTS idx_pedidos_cliente ON pedidos(cliente_id);
+CREATE INDEX IF NOT EXISTS idx_pedidos_estado ON pedidos(estado);
+CREATE INDEX IF NOT EXISTS idx_detalle_pedido ON detalle_pedido(pedido_id);
+CREATE INDEX IF NOT EXISTS idx_pagos_factura ON pagos(factura_id);
+CREATE INDEX IF NOT EXISTS idx_facturas_pedido ON facturas(pedido_id);

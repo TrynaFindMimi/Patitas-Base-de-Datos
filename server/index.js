@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import connectMongo from './src/config/mongodb.js';
 import pool from './src/config/postgres.js';
+import { runMigrations } from './src/config/runMigrations.js';
 import clientesRouter from './src/routes/clientes.js';
 import pedidosRouter from './src/routes/pedidos.js';
 import catalogoRouter from './src/routes/catalogo.js';
@@ -56,6 +57,7 @@ const start = async () => {
   );
   await pool.query('SELECT 1');
   console.log('PostgreSQL conectado');
+  await runMigrations();
   const PORT = process.env.PORT ?? 3001;
   server = app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
 };
