@@ -82,6 +82,20 @@ npm run start         # Inicia el servidor en producción
 npm run lint          # Ejecuta linter del frontend
 ```
 
+## Roles de usuario
+
+| Rol | Acceso |
+|---|---|
+| `cliente` | Navegar, comprar, ver historial de pedidos |
+| `admin` | Panel del dueño (stock, productos, pedidos) |
+| `owner` | Panel del dueño (stock, productos, pedidos) |
+
+Para asignar rol a un usuario:
+
+```sql
+UPDATE clientes SET rol = 'owner' WHERE email = 'usuario@email.com';
+```
+
 ## Características
 
 - **40+ productos** en 6 categorías (perros, gatos, aves, roedores, reptiles, peces)
@@ -89,7 +103,8 @@ npm run lint          # Ejecuta linter del frontend
 - Catálogo híbrido: productos hardcodeados en frontend + dinámicos desde API
 - Carrito de compras con persistencia local y sincronización con MongoDB
 - Generación de facturas en PDF con jsPDF
-- Autenticación JWT con roles
+- Autenticación JWT con roles (`cliente`, `admin`, `owner`)
+- Panel de dueño con gestión de stock, productos y pedidos
 - Transacciones ACID en PostgreSQL para pedidos y pagos
 - Cifrado de tarjetas con pgcrypto
 - Búsqueda con filtros (categoría, precio, etiquetas)

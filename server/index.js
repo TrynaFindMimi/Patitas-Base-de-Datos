@@ -5,23 +5,30 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import connectMongo from './src/config/mongodb.js';
 import pool from './src/config/postgres.js';
+import { runMigrations } from './src/config/runMigrations.js';
 import clientesRouter from './src/routes/clientes.js';
 import pedidosRouter from './src/routes/pedidos.js';
 import catalogoRouter from './src/routes/catalogo.js';
 import carritoRouter from './src/routes/carrito.js';
+import adminRouter from './src/routes/admin.js';
 
 dotenv.config();
 
 const app = express();
 
 app.use(helmet());
-app.use(cors({ origin: process.env.CLIENT_URL ?? 'http://localhost:5173' }));
+app.use(cors({
+  origin(origin, cb) {
+    cb(null, origin || true);
+  },
+}));
 app.use(express.json());
 
 app.use('/api/clientes', clientesRouter);
 app.use('/api/pedidos', pedidosRouter);
 app.use('/api/catalogo', catalogoRouter);
 app.use('/api/carrito', carritoRouter);
+app.use('/api/admin', adminRouter);
 
 app.get('/api/health', async (_req, res) => {
   try {
@@ -37,8 +44,8 @@ app.get('/api/health', async (_req, res) => {
 });
 
 app.use((err, _req, res, _next) => {
-  console.error(err);
-  res.status(500).json({ error: 'Error interno del servidor' });
+  console.error('Error:', err);
+  res.status(500).json({ error: err?.message || err?.toString() || 'Error interno del servidor' });
 });
 
 const requiredEnv = ['PG_HOST', 'PG_USER', 'PG_PASSWORD', 'PG_DATABASE', 'JWT_SECRET'];
@@ -56,6 +63,7 @@ const start = async () => {
   );
   await pool.query('SELECT 1');
   console.log('PostgreSQL conectado');
+  await runMigrations();
   const PORT = process.env.PORT ?? 3001;
   server = app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
 };

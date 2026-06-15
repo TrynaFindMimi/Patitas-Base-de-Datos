@@ -14,6 +14,7 @@ import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import MyOrders from './pages/MyOrders';
+import OwnerDashboard from './pages/OwnerDashboard';
 
 export default function App() {
   return (
@@ -35,6 +36,7 @@ export default function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/registro" element={<Register />} />
                 <Route path="/mis-pedidos" element={<MyOrders />} />
+                <Route path="/admin/stock" element={<OwnerDashboard />} />
               </Routes>
             </main>
             <Footer />

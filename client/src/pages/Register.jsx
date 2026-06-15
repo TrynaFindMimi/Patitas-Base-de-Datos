@@ -15,7 +15,7 @@ export default function Register() {
       await register(form);
       navigate('/');
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.error || err.message);
     }
   };
 
