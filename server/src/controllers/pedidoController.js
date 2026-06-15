@@ -33,15 +33,42 @@ export const crearPedido = async (req, res, next) => {
       direccion_id = rows[0].direccion_id;
     }
 
-    const { rows } = await client.query(
-      'SELECT fn_registrar_pedido($1, $2, $3, $4, $5) AS pedido_id',
-      [req.usuario.cliente_id, direccion_id, dept, envio, JSON.stringify(items)]
+    const { rows: deptRow } = await client.query(
+      'SELECT costo_envio, envio_gratis_desde FROM departamentos WHERE nombre = $1',
+      [dept]
     );
-    const pedido_id = rows[0].pedido_id;
+    if (!deptRow.length) {
+      throw new Error(`Departamento "${dept}" no encontrado en la base de datos`);
+    }
+    const { costo_envio: costoEnvio, envio_gratis_desde: gratisDesde } = deptRow[0];
 
-    const { rows: pedido } = await client.query(
-      'SELECT subtotal, costo_envio, total, departamento, tipo_envio FROM pedidos WHERE pedido_id = $1',
-      [pedido_id]
+    const { rows: [{ pedido_id }] } = await client.query(
+      `INSERT INTO pedidos (cliente_id, direccion_id, departamento, tipo_envio)
+       VALUES ($1, $2, $3, $4) RETURNING pedido_id`,
+      [req.usuario.cliente_id, direccion_id, dept, envio]
+    );
+
+    let subtotal = 0;
+    for (const item of items) {
+      const pId = item.producto_mongo_id || 'PROD-000';
+      const pNombre = item.nombre_producto || 'Producto';
+      const pCant = Math.max(1, parseInt(item.cantidad, 10) || 1);
+      const pPrecio = parseFloat(item.precio_unitario) || 0;
+
+      await client.query(
+        `INSERT INTO detalle_pedido (pedido_id, producto_mongo_id, nombre_producto, cantidad, precio_unitario)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [pedido_id, pId, pNombre, pCant, pPrecio]
+      );
+      subtotal += pCant * pPrecio;
+    }
+
+    const costoEnvioFinal = subtotal >= gratisDesde ? 0 : costoEnvio;
+    const total = subtotal + costoEnvioFinal;
+
+    await client.query(
+      `UPDATE pedidos SET subtotal = $1, costo_envio = $2, total = $3 WHERE pedido_id = $4`,
+      [subtotal, costoEnvioFinal, total, pedido_id]
     );
 
     try {
@@ -54,7 +81,7 @@ export const crearPedido = async (req, res, next) => {
     }
 
     await client.query('COMMIT');
-    res.status(201).json({ pedido_id, ...pedido[0] });
+    res.status(201).json({ pedido_id, subtotal, costo_envio: costoEnvioFinal, total, departamento: dept, tipo_envio: envio });
   } catch (err) {
     if (client) {
       try { await client.query('ROLLBACK'); } catch {}

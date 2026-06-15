@@ -38,8 +38,8 @@ app.get('/api/health', async (_req, res) => {
 });
 
 app.use((err, _req, res, _next) => {
-  console.error(err);
-  res.status(500).json({ error: err.message || 'Error interno del servidor' });
+  console.error('Error:', err);
+  res.status(500).json({ error: err?.message || err?.toString() || 'Error interno del servidor' });
 });
 
 const requiredEnv = ['PG_HOST', 'PG_USER', 'PG_PASSWORD', 'PG_DATABASE', 'JWT_SECRET'];
