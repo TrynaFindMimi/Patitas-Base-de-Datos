@@ -17,7 +17,12 @@ dotenv.config();
 const app = express();
 
 app.use(helmet());
-app.use(cors({ origin: process.env.CLIENT_URL ?? 'http://localhost:5173' }));
+const origenesPermitidos = [
+  'http://localhost:5173',
+  'https://patitas-base-de-datos.vercel.app',
+  ...(process.env.CLIENT_URL ? [process.env.CLIENT_URL] : []),
+];
+app.use(cors({ origin: origenesPermitidos }));
 app.use(express.json());
 
 app.use('/api/clientes', clientesRouter);
