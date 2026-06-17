@@ -35,14 +35,15 @@ export default function ProductCard({ product }) {
         </div>
       )}
       <Link to={`/producto/${product.id}`}>
-        <div className="aspect-square overflow-hidden relative">
+        <div className="aspect-square overflow-hidden relative bg-stone-100">
           <img
-            src={product.image} loading="lazy"
+            src={product.image}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="absolute inset-0 ring-1 ring-black/5 ring-inset group-hover:ring-primary/20 transition-all duration-500" />
         </div>
       </Link>
       <div className="p-4">

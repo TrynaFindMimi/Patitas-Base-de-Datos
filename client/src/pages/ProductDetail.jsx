@@ -87,8 +87,20 @@ export default function ProductDetail() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <div className="relative">
-          <div className="aspect-square rounded-2xl overflow-hidden brutal-border brutal-shadow-lg bg-white">
-            <img src={product.image} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
+          <div
+            className="aspect-square rounded-2xl overflow-hidden brutal-border brutal-shadow-lg bg-stone-100 cursor-crosshair group"
+            onMouseMove={handleMouseMove}
+            onMouseLeave={() => setZoom(s => ({ ...s, show: false }))}
+          >
+            <div
+              className="w-full h-full transition-transform duration-100"
+              style={{
+                backgroundImage: `url(${product.image})`,
+                backgroundSize: zoom.show ? '200%' : '100%',
+                backgroundPosition: zoom.show ? `${zoom.x}% ${zoom.y}%` : 'center',
+              }}
+            />
+            <div className="absolute inset-0 ring-1 ring-black/5 ring-inset rounded-2xl pointer-events-none" />
           </div>
           {product.isNew && (
             <div className="absolute top-4 left-4 sticker bg-neon-purple text-white animate-bounce-in">NUEVO</div>
