@@ -449,6 +449,23 @@ Cada endpoint sensible usa reglas `express-validator` ejecutadas antes del contr
 | `POST /api/pedidos` | `departamento` optional isString; `tipo_envio` optional isIn(['domicilio','paqueteria']); `direccion_id` optional isInt; `calle` optional notEmpty; `ciudad` optional notEmpty; `codigo_postal` optional notEmpty; `items` isArray({ min: 1 }) |
 | `POST /api/pedidos/pago` | `pedido_id` isUUID; `tipo_pago` optional isIn(['qr','tarjeta']); `metodo_id` optional isInt |
 
+### 4.5 Códigos de Error HTTP
+
+| Código | Significado | Escenarios |
+|---|---|---|
+| `200` | OK | Respuesta exitosa |
+| `201` | Creado | Registro, dirección, método pago, pedido, producto |
+| `400` | Bad Request | Categoría inválida en catálogo/admin |
+| `401` | Unauthorized | Token faltante, inválido, expirado, credenciales incorrectas |
+| `403` | Forbidden | Rol sin permisos para admin |
+| `404` | Not Found | Producto no encontrado, pedido no encontrado |
+| `409` | Conflict | producto_id duplicado en admin |
+| `422` | Unprocessable | Validación fallida (express-validator), parámetro `q` faltante, estado inválido |
+| `500` | Server Error | Error interno en controladores |
+| `503` | Service Unavailable | MongoDB no disponible en registro; health check falla |
+
+**Formato de error estándar:** `{ error: "mensaje descriptivo" }`
+
 ---
 
 ## 5. FRONTEND (REACT + VITE + TAILWIND)
