@@ -575,11 +575,72 @@ PUT /api/admin/pedidos/:id/estado
 
 ### 5.7 Estilos (Tailwind v4)
 
-- `@import "tailwindcss"` (v4)
-- Tema personalizado con `@theme`: colores neón, sombras brutalistas, animaciones
-- Clases utilitarias: `.brutal-border`, `.brutal-shadow`, `.hover-lift`, `.sticker`, `.text-gradient`, `.pattern-dots`
-- Animaciones: float, wiggle, pulse, bounce, marquee, gradient-shift
-- Diseño responsivo (mobile-first con hamburger menu)
+`client/src/index.css` — Tema brutalista con colores neón y animaciones juguetonas.
+
+**Paleta de colores personalizados (`@theme`):**
+| Variable | Color | Uso |
+|---|---|---|
+| `--color-primary` | `#FF6B35` (naranja) | Botones, acentos principales |
+| `--color-primary-dark` | `#E85D2C` | Hover estados |
+| `--color-primary-light` | `#FFF3ED` | Fondos suaves |
+| `--color-accent` | `#FFD23F` (amarillo) | Badges, destacados |
+| `--color-secondary` | `#06D6A0` (verde) | Éxito, confirmación |
+| `--color-neon-pink` | `#FF006E` | Stickers, errores |
+| `--color-neon-purple` | `#8338EC` | Acentos secundarios |
+| `--color-neon-blue` | `#3A86FF` | Links, interactivos |
+| `--color-neon-cyan` | `#00F5D4` | Acentos frescos |
+| `--color-bg` | `#FFF8F0` | Fondo general |
+| `--color-bg-card` | `#FFFFFF` | Fondo tarjetas |
+| `--color-bg-dark` | `#1A1A2E` | Footer, dark sections |
+| `--color-text` | `#1A1A2E` | Texto principal |
+| `--color-border` | `#1A1A2E` | Bordes (mismo que texto) |
+
+**CSS Custom Properties:**
+| Propiedad | Valor | Uso |
+|---|---|---|
+| `--font-family-body` | `'Outfit', system-ui, sans-serif` | Texto general |
+| `--font-family-display` | `'Space Grotesk', system-ui, sans-serif` | Títulos |
+| `--border-thick` | `3px` | Grosor bordes brutalistas |
+| `--shadow-brutal` | `5px 5px 0px #1A1A2E` | Sombra default |
+| `--shadow-brutal-lg` | `8px 8px 0px #1A1A2E` | Sombra grande |
+| `--shadow-brutal-sm` | `3px 3px 0px #1A1A2E` | Sombra pequeña |
+
+**Clases utilitarias:**
+| Clase | Efecto |
+|---|---|
+| `.brutal-border` | `border: 3px solid #1A1A2E` |
+| `.brutal-shadow` / `.brutal-shadow-lg` / `.brutal-shadow-sm` | Sombras duras sin blur |
+| `.hover-lift` | Translate(-3px, -3px) + shadow-lg en hover |
+| `.sticker` | Badge pill con border y uppercase |
+| `.text-gradient` | Gradiente naranja → rosa → púrpura en texto |
+| `.pattern-dots` | Background de puntos |
+| `.pattern-zigzag` | Background de zigzag |
+| `.blob-shape` / `.blob-shape-2` | Bordes irregulares blob |
+
+**Gradientes predefinidos:**
+| Clase | Colores |
+|---|---|
+| `.gradient-tropical` | naranja → rosa → púrpura → azul |
+| `.gradient-sunset` | naranja → amarillo → verde |
+| `.gradient-ocean` | azul → cyan → verde |
+| `.gradient-fire` | rosa → naranja → amarillo |
+
+**Animaciones keyframes:**
+| Animación | Duración | Comportamiento |
+|---|---|---|
+| `float` | 4s | Flotar vertical ±15px con rotación |
+| `float-reverse` | 5s | Flotar inverso |
+| `wiggle` | 2s | Oscilar ±3° |
+| `pulse-brutal` | 2s | Scale 1 → 1.05 |
+| `slide-in-right` | 0.3s | Deslizar desde derecha |
+| `slide-in-up` | 0.5s | Deslizar desde abajo |
+| `bounce-in` | 0.4s | Escalar 0 → 1.15 → 1 |
+| `marquee` | 20s | Desplazamiento horizontal infinito |
+| `gradient-shift` | 4s | Movimiento de fondo gradiente |
+
+**Scrollbar personalizada:** ancho 10px, thumb naranja con borde, track color bg.
+
+**Diseño responsivo:** mobile-first con menú hamburguesa en `< lg` (`1024px`).
 
 ---
 
