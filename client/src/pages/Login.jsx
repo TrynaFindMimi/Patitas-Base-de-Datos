@@ -38,6 +38,9 @@ export default function Login() {
           <button type="submit" disabled={cargando} className="w-full bg-primary text-white font-bold py-3 rounded-xl brutal-border brutal-shadow hover-lift transition-all disabled:opacity-50">
             {cargando ? 'Ingresando...' : 'Ingresar'}
           </button>
+          <button type="button" onClick={() => setForm({ email: 'owner@patitas.bo', password: 'owner12345' })} className="w-full bg-yellow-300 text-text font-bold py-2.5 rounded-xl brutal-border brutal-shadow-sm hover-lift transition-all text-sm">
+            Acceso rápido: Dueño
+          </button>
           <div className="flex items-center justify-between text-sm mt-2">
             <Link to="/registro" className="text-primary font-bold hover:underline">Registrate</Link>
             <span className="text-text-muted">¿Olvidaste tu contraseña?</span>

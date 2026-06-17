@@ -13,6 +13,7 @@ const SQL_FILES = [
   '02_roles.sql',
   '03_views.sql',
   '04_procedures.sql',
+  '05_seed_owner.sql',
 ];
 
 export const runMigrations = async () => {
