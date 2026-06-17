@@ -31,8 +31,8 @@ export default function Cart() {
         <div className="lg:col-span-2 space-y-4">
           {items.map((item, index) => (
             <div key={item.id} className="bg-white brutal-border brutal-shadow rounded-2xl p-4 flex gap-4 hover-lift transition-all" style={{ animationDelay: `${index * 100}ms` }}>
-              <Link to={`/producto/${item.id}`} className="w-24 h-24 rounded-xl overflow-hidden brutal-border shrink-0">
-                <img src={item.image} alt={item.name} className="w-full h-full object-cover" loading="lazy" />
+              <Link to={`/producto/${item.id}`} className="w-24 h-24 rounded-xl overflow-hidden brutal-border shrink-0 bg-stone-100 group">
+                <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
               </Link>
               <div className="flex-1 min-w-0">
                 <Link to={`/producto/${item.id}`}>
@@ -41,14 +41,20 @@ export default function Cart() {
                 <p className="text-primary font-black text-lg" style={{ fontFamily: 'var(--font-family-display)' }}>Bs {item.price.toFixed(2)}</p>
                 <div className="flex items-center justify-between mt-3">
                   <div className="flex items-center gap-2">
-                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="w-9 h-9 rounded-xl brutal-border bg-white flex items-center justify-center hover:bg-accent transition-colors cursor-pointer brutal-shadow-sm hover-lift">
+                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1} className="w-9 h-9 rounded-xl brutal-border bg-white flex items-center justify-center hover:bg-accent transition-colors cursor-pointer brutal-shadow-sm hover-lift disabled:opacity-30 disabled:cursor-not-allowed">
                       <IconMinus className="w-3 h-3" />
                     </button>
                     <span className="w-10 h-9 rounded-xl brutal-border bg-accent flex items-center justify-center font-black text-sm">{item.quantity}</span>
-                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="w-9 h-9 rounded-xl brutal-border bg-white flex items-center justify-center hover:bg-accent transition-colors cursor-pointer brutal-shadow-sm hover-lift">
+                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} disabled={item.quantity >= (item.stock ?? 9999)} className="w-9 h-9 rounded-xl brutal-border bg-white flex items-center justify-center hover:bg-accent transition-colors cursor-pointer brutal-shadow-sm hover-lift disabled:opacity-30 disabled:cursor-not-allowed">
                       <IconPlus className="w-3 h-3" />
                     </button>
                   </div>
+                  {item.stock !== undefined && item.quantity >= item.stock && (
+                    <p className="text-xs font-bold text-amber-600 mt-1">Stock maximo alcanzado</p>
+                  )}
+                  {item.stock !== undefined && item.stock - item.quantity <= 5 && item.quantity < item.stock && (
+                    <p className="text-xs font-bold text-amber-600 mt-1">Solo quedan {item.stock - item.quantity} unid. disponibles</p>
+                  )}
                   <button onClick={() => removeItem(item.id)} className="sticker bg-neon-pink text-white cursor-pointer hover-lift transition-all">Eliminar</button>
                 </div>
               </div>

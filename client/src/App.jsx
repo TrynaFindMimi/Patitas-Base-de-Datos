@@ -36,6 +36,7 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<OwnerGuard><Home /></OwnerGuard>} />
                 <Route path="/catalogo" element={<OwnerGuard><Catalog /></OwnerGuard>} />
+                <Route path="/producto" element={<Navigate to="/catalogo" replace />} />
                 <Route path="/producto/:id" element={<OwnerGuard><ProductDetail /></OwnerGuard>} />
                 <Route path="/carrito" element={<OwnerGuard><Cart /></OwnerGuard>} />
                 <Route path="/checkout" element={<OwnerGuard><Checkout /></OwnerGuard>} />

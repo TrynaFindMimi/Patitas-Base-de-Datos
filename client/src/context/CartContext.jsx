@@ -2,12 +2,16 @@ import { createContext, useContext, useReducer, useEffect } from 'react';
 
 const CartContext = createContext(null);
 
+const maxStock = 9999;
+
 const cartReducer = (state, action) => {
   switch (action.type) {
     case 'ADD_ITEM': {
       const prodId = String(action.product.id);
+      const stock = action.product.stock ?? maxStock;
       const existing = state.items.find(i => i.id === prodId);
       if (existing) {
+        if (existing.quantity >= stock) return state;
         return {
           ...state,
           items: state.items.map(i =>
@@ -19,13 +23,16 @@ const cartReducer = (state, action) => {
     }
     case 'REMOVE_ITEM':
       return { ...state, items: state.items.filter(i => i.id !== String(action.id)) };
-    case 'UPDATE_QUANTITY':
+    case 'UPDATE_QUANTITY': {
+      const item = state.items.find(i => i.id === String(action.id));
+      const stock = item?.stock ?? maxStock;
       return {
         ...state,
         items: state.items.map(i =>
-          i.id === String(action.id) ? { ...i, quantity: Math.max(1, action.quantity) } : i
+          i.id === String(action.id) ? { ...i, quantity: Math.min(Math.max(1, action.quantity), stock) } : i
         ),
       };
+    }
     case 'CLEAR_CART':
       return { ...state, items: [] };
     default:
