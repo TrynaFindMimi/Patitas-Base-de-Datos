@@ -15,6 +15,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import MyOrders from './pages/MyOrders';
 import OwnerDashboard from './pages/OwnerDashboard';
+import OwnerPanel from './pages/OwnerPanel';
 
 export default function App() {
   return (
@@ -36,6 +37,7 @@ export default function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/registro" element={<Register />} />
                 <Route path="/mis-pedidos" element={<MyOrders />} />
+                <Route path="/admin/panel" element={<OwnerPanel />} />
                 <Route path="/admin/stock" element={<OwnerDashboard />} />
               </Routes>
             </main>

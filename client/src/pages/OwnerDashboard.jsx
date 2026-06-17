@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { adminService } from '../services/catalogo';
 import {
@@ -17,7 +18,13 @@ const tabs = [
 
 export default function OwnerDashboard() {
   const { usuario } = useAuth();
-  const [tab, setTab] = useState('stock');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [tab, setTab] = useState(searchParams.get('tab') || 'stock');
+
+  const cambiarTab = (id) => {
+    setTab(id);
+    setSearchParams({ tab: id });
+  };
 
   const acceso = usuario?.rol === 'owner' || usuario?.rol === 'admin';
   if (!acceso) {
@@ -48,7 +55,7 @@ export default function OwnerDashboard() {
         {tabs.map(t => (
           <button
             key={t.id}
-            onClick={() => setTab(t.id)}
+            onClick={() => cambiarTab(t.id)}
             className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all brutal-border brutal-shadow-sm cursor-pointer ${
               tab === t.id ? 'bg-primary text-white' : 'bg-white text-text hover:bg-accent'
             }`}

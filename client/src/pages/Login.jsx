@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
-  const { login, cargando } = useAuth();
+  const { login, cargando, usuario } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
@@ -12,8 +12,12 @@ export default function Login() {
     e.preventDefault();
     setError('');
     try {
-      await login(form.email, form.password);
-      navigate('/');
+      const user = await login(form.email, form.password);
+      if (user?.rol === 'owner' || user?.rol === 'admin') {
+        navigate('/admin/panel');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       setError(err.response?.data?.error || err.message);
     }
