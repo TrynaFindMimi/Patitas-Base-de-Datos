@@ -25,6 +25,7 @@ export default function ProductDetail() {
           category: found.categoria,
           brand: found.marca || '',
           description: found.descripcion || found.nombre,
+          stock: found.stock ?? 0,
           rating: 4.5,
           isNew: false,
           promo: null,
@@ -64,6 +65,13 @@ export default function ProductDetail() {
       </div>
     );
   }
+
+  const stock = product.stock ?? 0;
+  const stockLabel = stock === 0
+    ? 'Agotado'
+    : stock <= 10
+    ? 'Quedan pocas unidades'
+    : null;
 
   const inCart = items.some(i => i.id === product.id);
 
@@ -109,15 +117,41 @@ export default function ProductDetail() {
             <p className="text-4xl font-black text-primary" style={{ fontFamily: 'var(--font-family-display)' }}>Bs {product.price.toFixed(2)}</p>
           </div>
 
-          <p className="text-text-muted leading-relaxed mb-8 text-lg">{product.description}</p>
+          <p className="text-text-muted leading-relaxed mb-6 text-lg">{product.description}</p>
+
+          <div className="flex items-center gap-4 mb-6">
+            <div className="bg-white brutal-border brutal-shadow-sm rounded-xl px-4 py-3">
+              <span className="text-xs font-bold text-text-muted uppercase">Stock</span>
+              <p className={`text-lg font-black ${stock === 0 ? 'text-red-600' : stock <= 10 ? 'text-amber-600' : 'text-green-700'}`} style={{ fontFamily: 'var(--font-family-display)' }}>
+                {stock === 0 ? 'Agotado' : `${stock} unid.`}
+              </p>
+            </div>
+            {product.brand && (
+              <div className="bg-white brutal-border brutal-shadow-sm rounded-xl px-4 py-3">
+                <span className="text-xs font-bold text-text-muted uppercase">Marca</span>
+                <p className="text-lg font-black text-text" style={{ fontFamily: 'var(--font-family-display)' }}>{product.brand}</p>
+              </div>
+            )}
+          </div>
+
+          {stockLabel && (
+            <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-xl mb-6 text-sm font-bold animate-bounce-in">
+              {stockLabel}
+            </div>
+          )}
 
           <button
             onClick={() => addItem(product)}
+            disabled={stock === 0}
             className={`w-full sm:w-auto px-10 py-4 rounded-xl text-lg font-black brutal-border brutal-shadow-lg hover-lift transition-all cursor-pointer ${
-              inCart ? 'bg-secondary text-white' : 'bg-primary text-white'
+              stock === 0
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                : inCart
+                  ? 'bg-secondary text-white'
+                  : 'bg-primary text-white hover:bg-primary-dark'
             }`}
           >
-            {inCart ? '✓ Ya esta en tu carrito' : '🛒 Agregar al carrito'}
+            {stock === 0 ? 'Agotado' : inCart ? '✓ Ya esta en tu carrito' : '🛒 Agregar al carrito'}
           </button>
 
           <div className="mt-8 flex flex-wrap items-center gap-4">

@@ -27,6 +27,7 @@ export const products = [
     type: 'Alimento',
     rating: 4.5,
     isNew: false,
+    stock: 50,
     promo: null,
   },
   {
@@ -40,6 +41,7 @@ export const products = [
     type: 'Cama',
     rating: 4.8,
     isNew: true,
+    stock: 50,
     promo: null,
   },
   {
@@ -53,6 +55,7 @@ export const products = [
     type: 'Juguete',
     rating: 4.3,
     isNew: false,
+    stock: 50,
     promo: { type: 'descuento', value: 15, label: '15% OFF' },
   },
   {
@@ -66,6 +69,7 @@ export const products = [
     type: 'Alimento',
     rating: 4.6,
     isNew: false,
+    stock: 50,
     promo: null,
   },
   {
@@ -79,6 +83,7 @@ export const products = [
     type: 'Accesorio',
     rating: 4.7,
     isNew: true,
+    stock: 50,
     promo: null,
   },
   {
@@ -92,6 +97,7 @@ export const products = [
     type: 'Accesorio',
     rating: 4.2,
     isNew: false,
+    stock: 50,
     promo: { type: 'combo', value: 20, label: 'Lleva 2 y ahorra 20%' },
   },
   {
@@ -105,6 +111,7 @@ export const products = [
     type: 'Accesorio',
     rating: 4.4,
     isNew: false,
+    stock: 50,
     promo: null,
   },
   {
@@ -118,6 +125,7 @@ export const products = [
     type: 'Alimento',
     rating: 4.1,
     isNew: true,
+    stock: 50,
     promo: null,
   },
   {
@@ -131,6 +139,7 @@ export const products = [
     type: 'Terrario',
     rating: 4.9,
     isNew: false,
+    stock: 50,
     promo: { type: 'descuento', value: 10, label: '10% OFF' },
   },
   {
@@ -144,6 +153,7 @@ export const products = [
     type: 'Iluminación',
     rating: 4.5,
     isNew: false,
+    stock: 50,
     promo: null,
   },
   {
@@ -157,6 +167,7 @@ export const products = [
     type: 'Sustrato',
     rating: 4.0,
     isNew: false,
+    stock: 50,
     promo: null,
   },
   {
@@ -170,6 +181,7 @@ export const products = [
     type: 'Accesorio',
     rating: 4.6,
     isNew: true,
+    stock: 50,
     promo: { type: 'descuento', value: 25, label: '25% OFF' },
   },
   {
@@ -183,6 +195,7 @@ export const products = [
     type: 'Accesorio',
     rating: 4.0,
     isNew: false,
+    stock: 50,
     promo: null,
   },
   {
@@ -196,6 +209,7 @@ export const products = [
     type: 'Accesorio',
     rating: 4.3,
     isNew: false,
+    stock: 50,
     promo: { type: 'combo', value: 15, label: 'Lleva 3 paga 2' },
   },
   {
@@ -209,6 +223,7 @@ export const products = [
     type: 'Cama',
     rating: 4.5,
     isNew: true,
+    stock: 50,
     promo: null,
   },
   {
@@ -222,6 +237,7 @@ export const products = [
     type: 'Alimento',
     rating: 4.2,
     isNew: false,
+    stock: 50,
     promo: null,
   },
   {
@@ -235,6 +251,7 @@ export const products = [
     type: 'Accesorio',
     rating: 4.4,
     isNew: true,
+    stock: 50,
     promo: null,
   },
   {
@@ -248,6 +265,7 @@ export const products = [
     type: 'Accesorio',
     rating: 4.7,
     isNew: true,
+    stock: 50,
     promo: null,
   },
   {
@@ -261,6 +279,7 @@ export const products = [
     type: 'Juguete',
     rating: 4.3,
     isNew: false,
+    stock: 50,
     promo: { type: 'descuento', value: 10, label: '10% OFF' },
   },
   {
@@ -274,6 +293,7 @@ export const products = [
     type: 'Accesorio',
     rating: 4.5,
     isNew: false,
+    stock: 50,
     promo: { type: 'combo', value: 15, label: 'Combo viajero' },
   },
   {
@@ -287,6 +307,7 @@ export const products = [
     type: 'Alimento',
     rating: 4.6,
     isNew: true,
+    stock: 50,
     promo: { type: 'descuento', value: 5, label: 'Nuevo' },
   },
   {
@@ -300,6 +321,7 @@ export const products = [
     type: 'Accesorio',
     rating: 4.0,
     isNew: false,
+    stock: 50,
     promo: null,
   },
   {
@@ -313,6 +335,7 @@ export const products = [
     type: 'Accesorio',
     rating: 4.2,
     isNew: false,
+    stock: 50,
     promo: null,
   },
   {
@@ -326,6 +349,7 @@ export const products = [
     type: 'Accesorio',
     rating: 4.1,
     isNew: false,
+    stock: 50,
     promo: null,
   },
   {
@@ -339,6 +363,7 @@ export const products = [
     type: 'Alimento',
     rating: 4.7,
     isNew: true,
+    stock: 50,
     promo: { type: 'descuento', value: 10, label: '10% OFF' },
   },
   {
@@ -352,6 +377,7 @@ export const products = [
     type: 'Juguete',
     rating: 4.3,
     isNew: false,
+    stock: 50,
     promo: null,
   },
   {
@@ -365,6 +391,7 @@ export const products = [
     type: 'Accesorio',
     rating: 4.4,
     isNew: true,
+    stock: 50,
     promo: null,
   },
   {
@@ -378,6 +405,7 @@ export const products = [
     type: 'Alimento',
     rating: 4.5,
     isNew: false,
+    stock: 50,
     promo: { type: 'combo', value: 15, label: 'Lleva 3 paga 2' },
   },
   {
@@ -391,6 +419,7 @@ export const products = [
     type: 'Accesorio',
     rating: 4.4,
     isNew: true,
+    stock: 50,
     promo: null,
   },
   {
@@ -404,6 +433,7 @@ export const products = [
     type: 'Juguete',
     rating: 4.2,
     isNew: false,
+    stock: 50,
     promo: null,
   },
   {
@@ -417,6 +447,7 @@ export const products = [
     type: 'Alimento',
     rating: 4.6,
     isNew: false,
+    stock: 50,
     promo: null,
   },
   {
@@ -430,6 +461,7 @@ export const products = [
     type: 'Accesorio',
     rating: 4.1,
     isNew: false,
+    stock: 50,
     promo: null,
   },
   {
@@ -443,6 +475,7 @@ export const products = [
     type: 'Alimento',
     rating: 4.3,
     isNew: true,
+    stock: 50,
     promo: { type: 'descuento', value: 10, label: '10% OFF' },
   },
   {
@@ -456,6 +489,7 @@ export const products = [
     type: 'Cama',
     rating: 4.2,
     isNew: true,
+    stock: 50,
     promo: null,
   },
   {
@@ -469,6 +503,7 @@ export const products = [
     type: 'Juguete',
     rating: 4.0,
     isNew: false,
+    stock: 50,
     promo: null,
   },
   {
@@ -482,6 +517,7 @@ export const products = [
     type: 'Alimento',
     rating: 4.3,
     isNew: false,
+    stock: 50,
     promo: null,
   },
   {
@@ -495,6 +531,7 @@ export const products = [
     type: 'Accesorio',
     rating: 4.4,
     isNew: true,
+    stock: 50,
     promo: null,
   },
   {
@@ -508,6 +545,7 @@ export const products = [
     type: 'Alimento',
     rating: 4.2,
     isNew: false,
+    stock: 50,
     promo: null,
   },
   {
@@ -521,6 +559,7 @@ export const products = [
     type: 'Accesorio',
     rating: 4.5,
     isNew: false,
+    stock: 50,
     promo: null,
   },
   {
@@ -534,6 +573,7 @@ export const products = [
     type: 'Cama',
     rating: 4.6,
     isNew: true,
+    stock: 50,
     promo: { type: 'descuento', value: 15, label: '15% OFF' },
   },
 ];
