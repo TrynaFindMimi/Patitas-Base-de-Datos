@@ -40,7 +40,8 @@ export const crearPedido = async (req, res, next) => {
     if (!deptRow.length) {
       throw new Error(`Departamento "${dept}" no encontrado en la base de datos`);
     }
-    const { costo_envio: costoEnvio, envio_gratis_desde: gratisDesde } = deptRow[0];
+    const costoEnvio = parseFloat(deptRow[0].costo_envio) || 0;
+    const gratisDesde = parseFloat(deptRow[0].envio_gratis_desde) || 0;
 
     const { rows: [{ pedido_id }] } = await client.query(
       `INSERT INTO pedidos (cliente_id, direccion_id, departamento, tipo_envio)
