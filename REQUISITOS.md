@@ -435,6 +435,22 @@ PUT /api/admin/pedidos/:id/estado
 
 ---
 
+### 4.4 Reglas de Validación (express-validator)
+
+Cada endpoint sensible usa reglas `express-validator` ejecutadas antes del controlador mediante el middleware `validar` (que llama `validationResult()` y responde 422 si hay errores).
+
+| Endpoint | Reglas |
+|---|---|
+| `POST /api/clientes/registro` | `email` isEmail; `password` isLength({ min: 8 }); `nombre` notEmpty; `apellido` notEmpty |
+| `POST /api/clientes/login` | `email` isEmail; `password` notEmpty |
+| `POST /api/clientes/direcciones` | `calle` notEmpty; `ciudad` notEmpty; `estado` notEmpty; `codigo_postal` notEmpty |
+| `POST /api/clientes/metodos-pago` | `tipo` isIn(['credito','debito']); `numero_tarjeta` isLength({ min: 16, max: 16 }); `fecha_expiracion` notEmpty |
+| `PUT /api/carrito` | `items` isArray |
+| `POST /api/pedidos` | `departamento` optional isString; `tipo_envio` optional isIn(['domicilio','paqueteria']); `direccion_id` optional isInt; `calle` optional notEmpty; `ciudad` optional notEmpty; `codigo_postal` optional notEmpty; `items` isArray({ min: 1 }) |
+| `POST /api/pedidos/pago` | `pedido_id` isUUID; `tipo_pago` optional isIn(['qr','tarjeta']); `metodo_id` optional isInt |
+
+---
+
 ## 5. FRONTEND (REACT + VITE + TAILWIND)
 
 ### 5.1 Estructura de Rutas
