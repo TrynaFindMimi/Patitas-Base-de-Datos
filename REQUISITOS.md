@@ -271,9 +271,12 @@ Datos semilla: La Paz (15, domicilio, 500), Oruro (20, domicilio, 500), Santa Cr
 
 ### 4.1 Middleware Global
 - `helmet()` — seguridad HTTP
-- `cors()` — origen dinámico (permite cualquier origin)
+- `cors()` — origen dinámico: `origin(origin, cb) { cb(null, origin || true) }` (permite cualquier origin, incluyendo `null` para Postman/pruebas)
 - `express.json()` — parseo JSON
-- Middleware de error global: captura errores y responde `{ error: mensaje }`
+- Middleware de error global: captura errores con `console.error()` y responde `{ error: mensaje }` con status 500. No filtra por tipo de error.
+- **Graceful Shutdown**: En SIGINT/SIGTERM: cierra HTTP server con `server.close()`, desconecta MongoDB con `mongoose.connection.close()`, cierra pool de PostgreSQL con `pool.end()`, luego `process.exit(0)`.
+- **Validación de envs al inicio**: Faltan `PG_HOST`, `PG_USER`, `PG_PASSWORD`, `PG_DATABASE`, `JWT_SECRET` → `console.error()` + `process.exit(1)` antes de iniciar.
+- **Tolerancia a fallos MongoDB**: Si `connectMongo()` falla, imprime warning y el servidor continúa sin catálogo ni carrito dinámico.
 
 ### 4.2 Autenticación
 
