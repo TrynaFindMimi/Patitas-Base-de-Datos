@@ -454,6 +454,68 @@ PUT /api/admin/pedidos/:id/estado
 | `/mis-pedidos` | MyOrders | Historial de pedidos + descarga PDF factura |
 | `/admin/stock` | OwnerDashboard | Panel admin: stock, productos, pedidos |
 
+### 5.2 Descripción Detallada de Páginas
+
+**Home** (`Home.jsx`):
+- **Estado local**: `currentSlide` (carrusel rotativo), `featured` (productos destacados desde API)
+- **Efectos**: `setInterval` 5s para carrusel; `useEffect` inicial que llama a `catalogoService.listar()` para obtener hasta 4 productos destacados de MongoDB
+- **Renderiza**: Carrusel hero con 3 imágenes Unsplash + overlay gradiente; parrilla de 6 categorías de animales (`CategoryCard`); sección de productos destacados (`ProductCard`); sección de beneficios (envío, shield, heart, phone); newsletter (solo UI)
+- **Fallback**: Si API falla, `featured` queda vacío sin error visible
+
+**Catalog** (`Catalog.jsx`):
+- **Estado local**: `productos[]`, `total`, `loading`, `error`, `precioMin`, `precioMax`
+- **URLSearchParams**: `categoria` y `etiqueta` como query params (compartibles por URL)
+- **Efectos**: `useEffect` que llama a `catalogoService.listar(params)` con cada cambio de filtro; mapea `productos` desde API a formato `ProductCard`
+- **Filtros**: categoría (comida, ropa, juguetes, accesorios, salud), etiqueta, rango de precio (min/max)
+- **Imágenes**: usa `productImages` del objeto hardcodeado como fallback si API no trae imagen
+
+**ProductDetail** (`ProductDetail.jsx`):
+- Toma `id` de URL params, busca coincidencia en datos hardcodeados vs API
+- Muestra: imagen ampliada, nombre, precio, rating, descripción, selector de cantidad, botón añadir al carrito
+- Productos relacionados: misma categoría
+
+**Cart** (`Cart.jsx`):
+- Consume `CartContext`: muestra `items[]`, `subtotal`, `totalItems`
+- Controles: incrementar/decrementar cantidad, eliminar item, vaciar carrito
+- Enlace a `/checkout` si hay items; mensaje "carrito vacío" si no
+- Persiste en localStorage automáticamente vía `useEffect`
+
+**Checkout** (`Checkout.jsx`):
+- **Estado local**: `form` (name, email, phone, calle, departamento, tipo_envio, tipo_pago, card data), `submitted`, `loading`, `error`, `orderData`, `departamentos`
+- **Efecto inicial**: `pedidoService.departamentos()` desde API; fallback: array hardcodeado con datos default
+- **Flujo**:
+  1. Selección de departamento (cambia automáticamente tipo de envío: domicilio para LP/Oruro/SC, paquetería para otros)
+  2. Cálculo automático de costo de envío (gratis si subtotal >= `envio_gratis_desde`)
+  3. Selección de método de pago (QR/transferencia o tarjeta; si tarjeta: número, expiración, CVV)
+  4. Submit: verifica token JWT → `pedidoService.crear()` con items formateados → si ok, `pedidoService.pagar()` → muestra resumen con pedido_id y botón descargar PDF
+- **Manejo de errores**: muestra `error` string; token expirado redirige a login
+
+**MyOrders** (`MyOrders.jsx`):
+- **Estado local**: `pedidos[]`, `loading`, `downloading` (id del pedido descargándose)
+- **Guarda**: si no hay `usuario`, muestra pantalla de "inicia sesión"
+- **Efecto**: `pedidoService.listar()` cuando `usuario` cambia
+- **Renderiza**: tabla de pedidos con estado (coloreado), total, fecha; acciones: ver detalle y descargar PDF
+- **Descarga PDF**: `handleDownload()` → `pedidoService.detalle(id)` → `generateInvoicePDF()` → `doc.save()`
+
+**OwnerDashboard** (`OwnerDashboard.jsx`):
+- **Estado local**: `tab` ('stock' | 'add' | 'orders')
+- **Guarda**: si rol != 'owner'/'admin', muestra pantalla "Acceso restringido"
+- **Tabs**:
+  - **Stock** (`tab='stock'`): `adminService.listar()` → muestra todas las categorías con productos; toggle activo/inactivo; editar stock in-place
+  - **Nuevo Producto** (`tab='add'`): formulario con campos dinámicos según categoría; llama `adminService.crearProducto(categoria, data)`
+  - **Pedidos** (`tab='orders'`): `adminService.pedidos()` → tabla con cliente, items, total, estado; dropdown para cambiar estado vía `adminService.actualizarEstado(id, estado)`
+
+**Login / Register**:
+- Formularios con validación básica (email formato, password >= 8 chars)
+- Llaman a `authService.login()` / `authService.register()`
+- En éxito: almacenan token y usuario en localStorage, redirigen a Home
+- En error: muestran mensaje de error
+
+**LatestNews / Promotions / Contact**:
+- `LatestNews`: renderiza datos de `latestNews` desde products.js, tarjetas con fecha y productos relacionados
+- `Promotions`: filtra `promotions` por brand/type, muestra `PromoCard` con descuento y fecha límite
+- `Contact`: formulario de contacto (solo UI, sin endpoint), mapa/business info
+
 ### 5.2 Componentes Compartidos
 
 | Componente | Props | Descripción |
