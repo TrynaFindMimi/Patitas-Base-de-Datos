@@ -66,14 +66,16 @@ export default function Navbar() {
             </div>
 
             <div className="flex items-center gap-3">
-              <Link to="/carrito" className="relative bg-accent brutal-border brutal-shadow-sm rounded-xl p-2.5 hover-lift transition-all">
-                <IconShoppingBag className="w-6 h-6 text-text" />
-                {totalItems > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-neon-pink text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-black brutal-border animate-bounce-in">
-                    {totalItems}
-                  </span>
-                )}
-              </Link>
+              {(!usuario || (usuario.rol !== 'owner' && usuario.rol !== 'admin')) && (
+                <Link to="/carrito" className="relative bg-accent brutal-border brutal-shadow-sm rounded-xl p-2.5 hover-lift transition-all">
+                  <IconShoppingBag className="w-6 h-6 text-text" />
+                  {totalItems > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-neon-pink text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-black brutal-border animate-bounce-in">
+                      {totalItems}
+                    </span>
+                  )}
+                </Link>
+              )}
 
               {usuario ? (
                 <div className="relative group">
@@ -82,9 +84,11 @@ export default function Navbar() {
                   </button>
                   <div className="absolute right-0 top-full mt-2 w-52 bg-white brutal-border brutal-shadow-lg rounded-2xl p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
                     <p className="text-sm font-bold text-text truncate mb-2">{usuario.nombre}</p>
-                    <Link to="/mis-pedidos" className="block w-full text-left px-3 py-2 rounded-xl text-sm font-bold bg-white text-text hover:bg-accent transition-all mb-1">
-                      Mis pedidos
-                    </Link>
+                    {usuario.rol !== 'owner' && usuario.rol !== 'admin' && (
+                      <Link to="/mis-pedidos" className="block w-full text-left px-3 py-2 rounded-xl text-sm font-bold bg-white text-text hover:bg-accent transition-all mb-1">
+                        Mis pedidos
+                      </Link>
+                    )}
                     {(usuario?.rol === 'owner' || usuario?.rol === 'admin') && (
                       <Link to="/admin/panel" className="block w-full text-left px-3 py-2 rounded-xl text-sm font-bold bg-amber-50 text-amber-700 hover:bg-amber-100 transition-all mb-1">
                         Panel de Control
