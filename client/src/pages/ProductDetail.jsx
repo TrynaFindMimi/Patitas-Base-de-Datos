@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { catalogoService } from '../services/catalogo.js';
 import { useCart } from '../context/CartContext';
-import { IconTruck, IconShield } from '../components/Icons';
+import { IconTruck, IconShield, IconShoppingBag, IconCheck } from '../components/Icons';
 
 export default function ProductDetail() {
   const { id } = useParams();
-  const { addItem, items } = useCart();
+  const { addItem } = useCart();
   const [product, setProduct] = useState(null);
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [qty, setQty] = useState(1);
+  const [added, setAdded] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -73,44 +75,28 @@ export default function ProductDetail() {
     ? 'Quedan pocas unidades'
     : null;
 
-  const inCart = items.some(i => i.id === product.id);
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
       <nav className="flex items-center gap-2 text-sm mb-6 flex-wrap">
         <Link to="/" className="bg-white brutal-border brutal-shadow-sm rounded-lg px-3 py-1 font-bold hover-lift transition-all">Inicio</Link>
-        <span className="text-text-muted">→</span>
+        <span className="text-text-muted">&rarr;</span>
         <Link to="/catalogo" className="bg-white brutal-border brutal-shadow-sm rounded-lg px-3 py-1 font-bold hover-lift transition-all">Catalogo</Link>
-        <span className="text-text-muted">→</span>
+        <span className="text-text-muted">&rarr;</span>
         <span className="sticker bg-accent text-text">{product.name}</span>
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <div className="relative">
-          <div
-            className="aspect-square rounded-2xl overflow-hidden brutal-border brutal-shadow-lg bg-stone-100 cursor-crosshair group"
-            onMouseMove={handleMouseMove}
-            onMouseLeave={() => setZoom(s => ({ ...s, show: false }))}
-          >
-            <div
-              className="w-full h-full transition-transform duration-100"
-              style={{
-                backgroundImage: `url(${product.image})`,
-                backgroundSize: zoom.show ? '200%' : '100%',
-                backgroundPosition: zoom.show ? `${zoom.x}% ${zoom.y}%` : 'center',
-              }}
-            />
+          <div className="aspect-square rounded-2xl overflow-hidden brutal-border brutal-shadow-lg bg-stone-100">
+            <img src={product.image} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
             <div className="absolute inset-0 ring-1 ring-black/5 ring-inset rounded-2xl pointer-events-none" />
           </div>
-          {product.isNew && (
-            <div className="absolute top-4 left-4 sticker bg-neon-purple text-white animate-bounce-in">NUEVO</div>
-          )}
         </div>
 
         <div>
           <div className="flex items-center gap-2 mb-3">
             <span className="sticker bg-primary text-white">{product.category}</span>
-            <span className="sticker bg-accent text-text">{product.brand}</span>
+            {product.brand && <span className="sticker bg-accent text-text">{product.brand}</span>}
           </div>
 
           <h1 className="text-3xl sm:text-4xl font-black text-text mb-4" style={{ fontFamily: 'var(--font-family-display)' }}>{product.name}</h1>
@@ -152,18 +138,29 @@ export default function ProductDetail() {
             </div>
           )}
 
+          <div className="flex items-center gap-4 mb-2">
+            <div className="flex items-center gap-2">
+              <button onClick={() => setQty(q => Math.max(1, q - 1))} disabled={stock === 0 || qty <= 1}
+                className="w-10 h-10 rounded-xl brutal-border bg-white flex items-center justify-center hover:bg-accent transition-colors cursor-pointer brutal-shadow-sm disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold">-</button>
+              <span className="w-14 h-10 rounded-xl brutal-border bg-accent flex items-center justify-center font-black text-base">{qty}</span>
+              <button onClick={() => setQty(q => Math.min(stock, q + 1))} disabled={stock === 0 || qty >= stock}
+                className="w-10 h-10 rounded-xl brutal-border bg-white flex items-center justify-center hover:bg-accent transition-colors cursor-pointer brutal-shadow-sm disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold">+</button>
+            </div>
+            <span className="text-sm font-bold text-text-muted">/ {stock} unid. disponibles</span>
+          </div>
+
           <button
-            onClick={() => addItem(product)}
+            onClick={() => { addItem(product, qty); setAdded(true); setTimeout(() => setAdded(false), 1500); }}
             disabled={stock === 0}
             className={`w-full sm:w-auto px-10 py-4 rounded-xl text-lg font-black brutal-border brutal-shadow-lg hover-lift transition-all cursor-pointer ${
               stock === 0
                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                : inCart
+                : added
                   ? 'bg-secondary text-white'
                   : 'bg-primary text-white hover:bg-primary-dark'
             }`}
           >
-            {stock === 0 ? 'Agotado' : inCart ? '✓ Ya esta en tu carrito' : '🛒 Agregar al carrito'}
+            {stock === 0 ? 'Agotado' : added ? <><IconCheck className="w-5 h-5 inline -mt-0.5" /> Agregado!</> : <><IconShoppingBag className="w-5 h-5 inline -mt-0.5" /> Agregar al carrito</>}
           </button>
 
           <div className="mt-8 flex flex-wrap items-center gap-4">

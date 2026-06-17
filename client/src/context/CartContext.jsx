@@ -9,17 +9,19 @@ const cartReducer = (state, action) => {
     case 'ADD_ITEM': {
       const prodId = String(action.product.id);
       const stock = action.product.stock ?? maxStock;
+      const cantidad = Math.max(1, Math.min(action.quantity ?? 1, stock));
       const existing = state.items.find(i => i.id === prodId);
       if (existing) {
-        if (existing.quantity >= stock) return state;
+        const nuevaCant = Math.min(existing.quantity + cantidad, stock);
+        if (nuevaCant === existing.quantity) return state;
         return {
           ...state,
           items: state.items.map(i =>
-            i.id === prodId ? { ...i, quantity: i.quantity + 1 } : i
+            i.id === prodId ? { ...i, quantity: nuevaCant } : i
           ),
         };
       }
-      return { ...state, items: [...state.items, { ...action.product, id: prodId, quantity: 1 }] };
+      return { ...state, items: [...state.items, { ...action.product, id: prodId, quantity: cantidad }] };
     }
     case 'REMOVE_ITEM':
       return { ...state, items: state.items.filter(i => i.id !== String(action.id)) };
@@ -54,7 +56,7 @@ export function CartProvider({ children }) {
     localStorage.setItem('patitas-cart', JSON.stringify(state.items));
   }, [state.items]);
 
-  const addItem = (product) => dispatch({ type: 'ADD_ITEM', product: { ...product, id: String(product.id) } });
+  const addItem = (product, quantity = 1) => dispatch({ type: 'ADD_ITEM', product: { ...product, id: String(product.id) }, quantity });
   const removeItem = (id) => dispatch({ type: 'REMOVE_ITEM', id: String(id) });
   const updateQuantity = (id, quantity) => dispatch({ type: 'UPDATE_QUANTITY', id: String(id), quantity });
   const clearCart = () => dispatch({ type: 'CLEAR_CART' });
