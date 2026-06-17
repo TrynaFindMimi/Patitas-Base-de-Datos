@@ -97,12 +97,11 @@ export const procesarPago = async (req, res, next) => {
   try {
     client = await getClient();
     await client.query('BEGIN');
-    const { pedido_id, tipo_pago, metodo_id } = req.body;
-    const pTipo = tipo_pago || 'qr';
+    const { pedido_id, metodo_id } = req.body;
 
     const { rows } = await client.query(
-      'SELECT fn_procesar_pago($1, $2, $3) AS factura_id',
-      [pedido_id, pTipo, metodo_id || null]
+      'SELECT fn_procesar_pago($1, $2) AS factura_id',
+      [pedido_id, metodo_id || null]
     );
 
     const { rows: factura } = await client.query(

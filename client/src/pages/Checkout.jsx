@@ -52,9 +52,9 @@ export default function Checkout() {
         pedido_id: pedido.pedido_id,
         factura_id: pago.factura_id,
         items: itemsFormateados,
-        subtotal,
-        envio: subtotal >= 999 ? 0 : 99,
-        total: subtotal + (subtotal >= 999 ? 0 : 99),
+        subtotal: pedido.subtotal,
+        envio: pedido.costo_envio,
+        total: pedido.total,
         direccion: {
           calle: form.address,
           ciudad: form.city,
