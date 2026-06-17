@@ -4,7 +4,6 @@ import { useCart } from '../context/CartContext';
 
 export default function ProductCard({ product }) {
   const { addItem } = useCart();
-  const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
   const stock = product.stock ?? 0;
@@ -17,12 +16,10 @@ export default function ProductCard({ product }) {
   const handleAdd = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    addItem(product, qty);
+    addItem(product, 1);
     setAdded(true);
     setTimeout(() => setAdded(false), 1200);
   };
-
-  const itemInCart = qty;
 
   return (
     <div className="bg-white brutal-border brutal-shadow rounded-2xl overflow-hidden hover-lift group relative h-full flex flex-col">
@@ -74,34 +71,21 @@ export default function ProductCard({ product }) {
             <svg key={i} className={`w-4 h-4 ${i < Math.round(product.rating) ? 'text-accent' : 'text-stone-200'}`} fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
           ))}
         </div>
-        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2">
           <span className="text-2xl font-black text-primary shrink-0" style={{ fontFamily: 'var(--font-family-display)' }}>Bs {product.price.toFixed(2)}</span>
-          <div className="flex items-center gap-1 shrink-0">
-            <button
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setQty(q => Math.max(1, q - 1)); }}
-              disabled={stock === 0 || qty <= 1}
-              className="w-8 h-8 rounded-lg brutal-border bg-white flex items-center justify-center hover:bg-accent transition-colors cursor-pointer brutal-shadow-sm disabled:opacity-30 disabled:cursor-not-allowed text-sm font-bold"
-            >-</button>
-            <span className="w-8 h-8 rounded-lg brutal-border bg-accent flex items-center justify-center font-black text-xs">{qty}</span>
-            <button
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setQty(q => Math.min(stock, q + 1)); }}
-              disabled={stock === 0 || qty >= stock}
-              className="w-8 h-8 rounded-lg brutal-border bg-white flex items-center justify-center hover:bg-accent transition-colors cursor-pointer brutal-shadow-sm disabled:opacity-30 disabled:cursor-not-allowed text-sm font-bold"
-            >+</button>
-            <button
-              onClick={handleAdd}
-              disabled={stock === 0}
-              className={`px-3 py-2 rounded-xl text-xs font-bold brutal-border brutal-shadow-sm hover-lift transition-all cursor-pointer ${
-                stock === 0
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  : added
-                    ? 'bg-secondary text-white'
-                    : 'bg-primary text-white hover:bg-primary-dark'
-              }`}
-            >
-              {stock === 0 ? 'Agotado' : added ? 'OK' : 'Agregar'}
-            </button>
-          </div>
+          <button
+            onClick={handleAdd}
+            disabled={stock === 0}
+            className={`px-4 py-2 rounded-xl text-xs font-bold brutal-border brutal-shadow-sm hover-lift transition-all cursor-pointer ${
+              stock === 0
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                : added
+                  ? 'bg-secondary text-white'
+                  : 'bg-primary text-white hover:bg-primary-dark'
+            }`}
+          >
+            {stock === 0 ? 'Agotado' : added ? 'OK' : 'Agregar'}
+          </button>
         </div>
       </div>
     </div>
