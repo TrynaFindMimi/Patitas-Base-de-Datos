@@ -195,7 +195,19 @@ Datos semilla: La Paz (15, domicilio, 500), Oruro (20, domicilio, 500), Santa Cr
 | `v_productos_mas_vendidos` | Productos por unidades vendidas e ingresos |
 | `v_clientes_frecuentes` | Clientes con >2 pedidos y gasto > promedio |
 
-### 2.4 Índices
+### 2.6 Seed de Owner por Defecto
+
+Archivo: `05_seed_owner.sql` (se ejecuta automáticamente en migraciones).
+
+Crea un usuario con rol `owner` para acceso inmediato al panel de control:
+```
+Email:    owner@patitas.bo
+Password: owner12345
+Rol:      owner
+```
+Usa `ON CONFLICT (email) DO NOTHING` para ser idempotente.
+
+### 2.7 Índices
 `idx_pedidos_cliente`, `idx_pedidos_estado`, `idx_detalle_pedido`, `idx_pagos_factura`, `idx_facturas_pedido`
 
 ### 2.5 Roles de BD
@@ -488,7 +500,8 @@ Cada endpoint sensible usa reglas `express-validator` ejecutadas antes del contr
 | `/login` | Login | Inicio de sesión |
 | `/registro` | Register | Registro de usuario |
 | `/mis-pedidos` | MyOrders | Historial de pedidos + descarga PDF factura |
-| `/admin/stock` | OwnerDashboard | Panel admin: stock, productos, pedidos |
+| `/admin/panel` | OwnerPanel | Dashboard ejecutivo con métricas y acceso rápido |
+| `/admin/stock` | OwnerDashboard | Gestión detallada: stock, productos, pedidos |
 
 ### 5.2 Descripción Detallada de Páginas
 
@@ -533,18 +546,28 @@ Cada endpoint sensible usa reglas `express-validator` ejecutadas antes del contr
 - **Renderiza**: tabla de pedidos con estado (coloreado), total, fecha; acciones: ver detalle y descargar PDF
 - **Descarga PDF**: `handleDownload()` → `pedidoService.detalle(id)` → `generateInvoicePDF()` → `doc.save()`
 
+**OwnerPanel** (`OwnerPanel.jsx`):
+- **Ruta**: `/admin/panel` — Dashboard ejecutivo para owner/admin
+- **Estado local**: `stats` (productos, activos, pedidos, pendientes, ingresos), `ultimosPedidos[]`, `loading`, `error`
+- **Efecto**: `Promise.all([adminService.listar(), adminService.pedidos()])` → calcula métricas
+- **Renderiza**: 4 tarjetas de métricas; sección "Acciones rápidas" con enlaces a stock, nuevo producto, pedidos, tienda; lista de últimos 5 pedidos con estado y total
+- **Guarda**: si rol != 'owner'/'admin', pantalla "Acceso restringido"
+
 **OwnerDashboard** (`OwnerDashboard.jsx`):
-- **Estado local**: `tab` ('stock' | 'add' | 'orders')
-- **Guarda**: si rol != 'owner'/'admin', muestra pantalla "Acceso restringido"
+- **Ruta**: `/admin/stock?tab=stock|add|orders` — Gestión detallada
+- **Estado local**: `tab` leído desde `searchParams.get('tab')` (default 'stock')
+- **URLSearchParams**: actualiza `tab` en URL para enlaces directos desde OwnerPanel
+- **Guarda**: si rol != 'owner'/'admin', pantalla "Acceso restringido"
 - **Tabs**:
-  - **Stock** (`tab='stock'`): `adminService.listar()` → muestra todas las categorías con productos; toggle activo/inactivo; editar stock in-place
-  - **Nuevo Producto** (`tab='add'`): formulario con campos dinámicos según categoría; llama `adminService.crearProducto(categoria, data)`
-  - **Pedidos** (`tab='orders'`): `adminService.pedidos()` → tabla con cliente, items, total, estado; dropdown para cambiar estado vía `adminService.actualizarEstado(id, estado)`
+  - **Stock**: tabla por categorías con toggle activo/inactivo y edición inline de stock
+  - **Nuevo Producto**: formulario con campos según categoría; llama `adminService.crearProducto()`
+  - **Pedidos**: tarjetas de pedido con acciones para cambiar estado
 
 **Login / Register**:
 - Formularios con validación básica (email formato, password >= 8 chars)
 - Llaman a `authService.login()` / `authService.register()`
-- En éxito: almacenan token y usuario en localStorage, redirigen a Home
+- En éxito: almacenan token y usuario en localStorage; si el rol es `owner` o `admin`, redirige a `/admin/panel`; caso contrario redirige a Home
+- Botón "Acceso rápido: Dueño" que auto-completa `owner@patitas.bo` / `owner12345`
 - En error: muestran mensaje de error
 
 **LatestNews / Promotions / Contact**:
@@ -556,7 +579,7 @@ Cada endpoint sensible usa reglas `express-validator` ejecutadas antes del contr
 
 | Componente | Props | Descripción |
 |---|---|---|
-| `Navbar` | — | Nav superior responsive: logo, enlaces, carrito badge, menú usuario (login/logout/admin link segun rol), menú hamburguesa mobile |
+| `Navbar` | — | Nav superior responsive: logo, enlaces, carrito badge, menú usuario (login/logout/enlace a Panel de Control segun rol), menú hamburguesa mobile |
 | `Footer` | — | Links, redes sociales, contacto, ubicación |
 | `ProductCard` | `{ product }` | Card: imagen, rating, nombre, precio, botón añadir al carrito |
 | `CategoryCard` | `{ category }` | Card de categoría de animal (perros, gatos, aves, reptiles, roedores, peces) |
@@ -777,6 +800,7 @@ En startup del servidor, `runMigrations.js` aplica secuencialmente:
 2. `02_roles.sql` (roles BD)
 3. `03_views.sql` (vistas analíticas)
 4. `04_procedures.sql` (funciones + stored procedures)
+5. `05_seed_owner.sql` (usuario owner por defecto)
 
 ### Seed MongoDB
 Se ejecuta automáticamente en `connectMongo()` si las colecciones están vacías.
