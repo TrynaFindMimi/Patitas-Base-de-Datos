@@ -582,12 +582,42 @@ Cada endpoint sensible usa reglas `express-validator` ejecutadas antes del contr
 
 ### 5.6 Datos Hardcodeados (Frontend)
 
-`client/src/data/products.js`:
-- 40+ productos estáticos para renderizado inmediato
-- 6 categorías de animales: perros, gatos, aves, roedores, reptiles, peces
-- 8 promociones, 8 novedades
-- 7 marcas, 6 tipos de producto
-- Imágenes hero, definiciones de categorías
+`client/src/data/products.js` — Contiene datos estáticos para renderizado inmediato sin depender de API. Sirve como catálogo de respaldo y para la landing page.
+
+**Exportaciones del archivo:**
+
+**`categories[]`** — 6 categorías de animales:
+```js
+{ id, name, image (Unsplash URL), description }
+```
+Categorías: `perros`, `gatos`, `aves`, `roedores`, `reptiles`, `peces`.
+
+**`brands[]`** — 7 marcas: `Royal Canin`, `Purina`, `Hill's`, `Acana`, `Kong`, `Exo Terra`, `Vitakraft`.
+
+**`productTypes[]`** — 7 tipos: `Alimento`, `Cama`, `Juguete`, `Accesorio`, `Terrario`, `Iluminación`, `Sustrato`.
+
+**`products[]`** — 40 productos estáticos:
+```js
+{ id, name, description, price, image, category, brand, type, rating, isNew, promo }
+```
+- `promo` puede ser `null` o `{ type: 'descuento'|'combo', value: número, label: string }`
+- Imágenes: Unsplash directas (no picsum)
+
+**`productImages{}`** — Mapa de IDs (COM-001, ROP-002, etc.) → URLs reales de producto:
+- Algunas URLs reales de tiendas online, otras usan `picsum.photos/seed/{id}/400/400`
+- Usado como fallback en Catalog y Home cuando la API no trae imagen
+
+**`heroImages[]`** — 3 URLs Unsplash para el carrusel del hero en Home.
+
+**`promotions[]`** — 8 promociones:
+```js
+{ id, title, description, image, brand, type, discount (%), limit (string vigencia) }
+```
+
+**`latestNews[]`** — 8 novedades:
+```js
+{ id, title, description, date (ISO), products[] (IDs de productos relacionados) }
+```
 
 ### 5.7 Estilos (Tailwind v4)
 
