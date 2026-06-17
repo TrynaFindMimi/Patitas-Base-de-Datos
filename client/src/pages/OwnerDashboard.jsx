@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { adminService } from '../services/catalogo';
 import {
   IconPackage, IconSave, IconAlertCircle, IconPlus,
-  IconShoppingBag, IconCheck, IconTruck,
+  IconShoppingBag, IconCheck, IconTruck, IconClose,
 } from '../components/Icons';
 
 const CATEGORIAS = ['comida', 'ropa', 'juguetes', 'accesorios', 'salud'];
@@ -77,9 +77,10 @@ function TabStock() {
   const [categorias, setCategorias] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [editando, setEditando] = useState(null);
-  const [nuevoStock, setNuevoStock] = useState('');
   const [mensaje, setMensaje] = useState('');
+  const [modal, setModal] = useState(null);
+
+  const [form, setForm] = useState({ nombre: '', precio: '', stock: '', image: '', descripcion: '' });
 
   useEffect(() => {
     adminService.listar()
@@ -88,21 +89,44 @@ function TabStock() {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleGuardar = async (categoria, productoId) => {
+  const abrirModal = (prod) => {
+    setForm({
+      nombre: prod.nombre || '',
+      precio: prod.precio?.toString() || '',
+      stock: prod.stock?.toString() || '0',
+      image: prod.image || '',
+      descripcion: prod.descripcion || '',
+    });
+    setModal(prod);
+  };
+
+  const handleGuardar = async () => {
+    if (!modal) return;
     try {
-      await adminService.actualizarProducto(categoria, productoId, { stock: parseInt(nuevoStock, 10) || 0 });
-      setCategorias(prev => prev.map(cat => {
-        if (cat.categoria !== categoria) return cat;
-        return {
-          ...cat,
-          productos: cat.productos.map(p =>
-            p.producto_id === productoId ? { ...p, stock: parseInt(nuevoStock, 10) || 0 } : p
-          )
-        };
-      }));
-      setEditando(null);
-      setMensaje('Stock actualizado');
+      const cambios = {};
+      if (form.nombre !== modal.nombre) cambios.nombre = form.nombre;
+      if (Number(form.precio) !== modal.precio) cambios.precio = Number(form.precio);
+      if (Number(form.stock) !== modal.stock) cambios.stock = Math.max(0, Math.floor(Number(form.stock)));
+      if (form.image !== (modal.image || '')) cambios.image = form.image;
+      if (form.descripcion !== (modal.descripcion || '')) cambios.descripcion = form.descripcion;
+
+      if (Object.keys(cambios).length) {
+        await adminService.actualizarProducto(modal.categoria, modal.producto_id, cambios);
+        setCategorias(prev => prev.map(cat => {
+          if (cat.categoria !== modal.categoria) return cat;
+          return {
+            ...cat,
+            productos: cat.productos.map(p =>
+              p.producto_id === modal.producto_id ? { ...p, ...cambios } : p
+            )
+          };
+        }));
+        setMensaje('Producto actualizado');
+      } else {
+        setMensaje('Sin cambios');
+      }
       setTimeout(() => setMensaje(''), 2500);
+      setModal(null);
     } catch (e) {
       setError(e.message);
     }
@@ -134,6 +158,7 @@ function TabStock() {
     <>
       {error && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 text-sm font-medium">{error}</div>}
       {mensaje && <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 text-sm font-medium animate-bounce-in">{mensaje}</div>}
+
       <div className="space-y-6">
         {categorias.map((cat, catIdx) => (
           <div key={cat.categoria} className="bg-white brutal-border brutal-shadow-lg rounded-2xl overflow-hidden">
@@ -151,7 +176,7 @@ function TabStock() {
                     <th className="px-4 py-3 font-bold">Precio</th>
                     <th className="px-4 py-3 font-bold w-24">Stock</th>
                     <th className="px-4 py-3 font-bold w-24">Activo</th>
-                    <th className="px-4 py-3 font-bold w-24">Accion</th>
+                    <th className="px-4 py-3 font-bold w-28">Accion</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -161,16 +186,9 @@ function TabStock() {
                       <td className="px-4 py-3 font-bold text-text">{prod.nombre}</td>
                       <td className="px-4 py-3 text-text">Bs {prod.precio?.toFixed(2)}</td>
                       <td className="px-4 py-3">
-                        {editando === `${catIdx}-${prodIdx}` ? (
-                          <input type="number" min="0" value={nuevoStock}
-                            onChange={e => setNuevoStock(e.target.value)}
-                            className="w-20 brutal-border rounded-lg px-2 py-1.5 font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary" autoFocus
-                          />
-                        ) : (
-                          <span className={`font-bold ${prod.stock <= 5 ? 'text-red-600' : prod.stock <= 20 ? 'text-amber-600' : 'text-green-700'}`}>
-                            {prod.stock}
-                          </span>
-                        )}
+                        <span className={`font-bold ${prod.stock <= 5 ? 'text-red-600' : prod.stock <= 20 ? 'text-amber-600' : 'text-green-700'}`}>
+                          {prod.stock}
+                        </span>
                       </td>
                       <td className="px-4 py-3">
                         <button
@@ -183,17 +201,9 @@ function TabStock() {
                         </button>
                       </td>
                       <td className="px-4 py-3">
-                        {editando === `${catIdx}-${prodIdx}` ? (
-                          <button onClick={() => handleGuardar(cat.categoria, prod.producto_id)}
-                            className="flex items-center gap-1 bg-primary text-white font-bold px-3 py-1.5 rounded-lg brutal-border brutal-shadow-sm hover-lift transition-all text-xs cursor-pointer"
-                          >
-                            <IconSave className="w-3.5 h-3.5" /> Guardar
-                          </button>
-                        ) : (
-                          <button onClick={() => { setEditando(`${catIdx}-${prodIdx}`); setNuevoStock(String(prod.stock)); }}
-                            className="bg-accent text-text font-bold px-3 py-1.5 rounded-lg brutal-border brutal-shadow-sm hover-lift transition-all text-xs cursor-pointer"
-                          >Editar</button>
-                        )}
+                        <button onClick={() => abrirModal({ ...prod, categoria: cat.categoria })}
+                          className="bg-accent text-text font-bold px-3 py-1.5 rounded-lg brutal-border brutal-shadow-sm hover-lift transition-all text-xs cursor-pointer"
+                        >Editar</button>
                       </td>
                     </tr>
                   ))}
@@ -203,6 +213,66 @@ function TabStock() {
           </div>
         ))}
       </div>
+
+      {modal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-overlay" onClick={() => setModal(null)}>
+          <div className="bg-white brutal-border brutal-shadow-lg rounded-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-black text-text" style={{ fontFamily: 'var(--font-family-display)' }}>
+                Editar: {modal.producto_id}
+              </h3>
+              <button onClick={() => setModal(null)} className="p-1.5 rounded-lg hover:bg-accent transition-all cursor-pointer">
+                <IconClose className="w-5 h-5" />
+              </button>
+            </div>
+
+            {form.image && (
+              <div className="mb-4">
+                <img src={form.image} alt="Preview" className="w-full h-40 object-cover rounded-xl brutal-border" onError={e => { e.target.style.display = 'none' }} />
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-text mb-1 uppercase">URL de imagen</label>
+                <input value={form.image} onChange={e => setForm(f => ({ ...f, image: e.target.value }))}
+                  placeholder="https://..." className="w-full brutal-border rounded-xl px-3 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary bg-white" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-text mb-1 uppercase">Nombre</label>
+                  <input value={form.nombre} onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))}
+                    className="w-full brutal-border rounded-xl px-3 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary bg-white" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-text mb-1 uppercase">Precio (Bs)</label>
+                  <input type="number" step="0.01" min="0" value={form.precio} onChange={e => setForm(f => ({ ...f, precio: e.target.value }))}
+                    className="w-full brutal-border rounded-xl px-3 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary bg-white" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-text mb-1 uppercase">Stock</label>
+                  <input type="number" min="0" value={form.stock} onChange={e => setForm(f => ({ ...f, stock: e.target.value }))}
+                    className="w-full brutal-border rounded-xl px-3 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary bg-white" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-text mb-1 uppercase">Descripcion</label>
+                <textarea value={form.descripcion} onChange={e => setForm(f => ({ ...f, descripcion: e.target.value }))}
+                  rows="3" className="w-full brutal-border rounded-xl px-3 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary bg-white" />
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-5">
+              <button onClick={() => setModal(null)}
+                className="flex-1 bg-gray-100 text-text font-bold py-3 rounded-xl brutal-border brutal-shadow-sm hover-lift transition-all text-sm cursor-pointer">Cancelar</button>
+              <button onClick={handleGuardar}
+                className="flex-1 bg-primary text-white font-bold py-3 rounded-xl brutal-border brutal-shadow hover-lift transition-all text-sm cursor-pointer">Guardar cambios</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
