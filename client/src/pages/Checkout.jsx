@@ -33,7 +33,8 @@ export default function Checkout() {
         producto_mongo_id: item.id || item.producto_id || 'PROD-000',
         nombre_producto: item.name || item.nombre,
         cantidad: item.quantity || item.cantidad || 1,
-        precio_unitario: item.price || item.precio || 0
+        precio_unitario: item.price || item.precio || 0,
+        categoria: item.category || item.categoria || 'comida'
       }));
 
       const pedido = await pedidoService.crear({

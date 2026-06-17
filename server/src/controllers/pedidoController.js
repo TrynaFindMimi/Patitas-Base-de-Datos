@@ -1,5 +1,13 @@
 import { query, getClient } from '../config/postgres.js';
-import { Carrito } from '../config/schema.js';
+import { Carrito, Comida, Ropa, Juguetes, Accesorios, Salud } from '../config/schema.js';
+
+const modeloPorCategoria = {
+  comida: Comida,
+  ropa: Ropa,
+  juguetes: Juguetes,
+  accesorios: Accesorios,
+  salud: Salud,
+};
 
 export const listarDepartamentos = async (_req, res, next) => {
   try {
@@ -15,9 +23,21 @@ export const listarDepartamentos = async (_req, res, next) => {
 export const crearPedido = async (req, res, next) => {
   let client;
   try {
+    const { items, departamento, tipo_envio, calle, ciudad, estado, codigo_postal } = req.body;
+
+    for (const item of items) {
+      const pId = item.producto_mongo_id || 'PROD-000';
+      const pNombre = item.nombre_producto || 'Producto';
+      const pCant = Math.max(1, parseInt(item.cantidad, 10) || 1);
+      const pCategoria = item.categoria || 'comida';
+      const Modelo = modeloPorCategoria[pCategoria] || Comida;
+      const producto = await Modelo.findOne({ producto_id: pId });
+      if (!producto) throw new Error(`Producto "${pNombre}" no encontrado`);
+      if (producto.stock < pCant) throw new Error(`Stock insuficiente para "${pNombre}". Disponible: ${producto.stock}`);
+    }
+
     client = await getClient();
     await client.query('BEGIN');
-    const { items, departamento, tipo_envio, calle, ciudad, estado, codigo_postal } = req.body;
 
     const dept = departamento || 'La Paz';
     const envio = tipo_envio || 'domicilio';
@@ -82,6 +102,15 @@ export const crearPedido = async (req, res, next) => {
     }
 
     await client.query('COMMIT');
+
+    for (const item of items) {
+      const pId = item.producto_mongo_id || 'PROD-000';
+      const pCant = Math.max(1, parseInt(item.cantidad, 10) || 1);
+      const pCategoria = item.categoria || 'comida';
+      const Modelo = modeloPorCategoria[pCategoria] || Comida;
+      await Modelo.updateOne({ producto_id: pId }, { $inc: { stock: -pCant } });
+    }
+
     res.status(201).json({ pedido_id, subtotal, costo_envio: costoEnvioFinal, total, departamento: dept, tipo_envio: envio });
   } catch (err) {
     if (client) {
